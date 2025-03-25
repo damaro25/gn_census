@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+{# <html lang="fr">
+
+<head>
+    <title>CensusMP: authentication</title>
+    <!-- HTML5 Shim and Respond.js IE9 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="censusmp">
+    <meta name="keywords" content=", censusmp,GBOS">
+    <meta name="author" content="GBOS">
+    <!-- Favicon icon -->
+
+    <link rel="icon" href="{{ asset('dist/img/favicon.png') }}" type="image/png">
+
+    <!-- Google font-->
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700,800" rel="stylesheet">
+    <!-- Required Fremwork -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('bower_components/bootstrap/css/bootstrap.min.css') }}">
+	<!-- themify icon -->
+	<link rel="stylesheet" type="text/css" href="{{ asset('dist/assets/icon/themify-icons/themify-icons.css') }}">
+	<!-- ico font -->
+	<link rel="stylesheet" type="text/css" href="{{asset('dist/assets/icon/icofont/css/icofont.css')  }}">
+    <!-- Style.css -->
+    <link rel="stylesheet" type="text/css" href="{{ asset('dist/assets/css/style.css') }}">
+    <!-- color .css -->
+
+
+</head>
+
+<body class="fix-menu">
+    <section class="login p-fixed d-flex text-center bg-primary common-img-bg">
+        <div class="overlay"></div>
+        <!-- Container-fluid starts -->
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-12">
+                    <!-- Authentication card start -->
+                    <div class="login-card card-block auth-body">
+                        <form class="md-float-material"  method="post" action="{{ path('app_login') }}">
+                            <div class="text-center">
+                                <img src="{{ asset('dist/img/logo_gbos_2.png') }}" alt="logo_gphc5">
+                            </div>
+                            <div class="auth-box">
+                                <div class="row m-b-20">
+                                    <div class="col-md-4">
+                                        <h3 class="text-center txt-primary">SIGN IN</h3>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p class="text-inverse m-t-25 text-right">CENSUS MONITORING PLATFORM</p>
+                                    </div>
+                                </div>
+                                <p class="text-inverse b-b-default text-left p-b-5"></p>
+                                    {% for message in app.flashes('danger')  %}
+                                        <div class="flash-notice alert alert-danger">
+                                            {{ message }}
+                                        </div>
+                                    {% endfor %}
+                                    <div class="input-group">
+                                        <input name="username" type="text" class="form-control" placeholder="Login" value="{{last_username}}">
+                                        <span class="md-line"></span>
+                                    </div>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" placeholder="Password" name="password">
+                                        <span class="md-line"></span>
+                                    </div>
+                                    <input type="hidden" name="_target_path" value="index" />
+                                    <input type="hidden" name="_target_path" value="{{ app.request.get('redirect_to') }}"/>
+                                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+                                    <div class="row m-t-25 text-left"></div>
+                                    <div class="row m-t-30">
+                                        <div class="col-md-12">
+                                            <button type="submit" class="btn btn-info btn-md btn-block waves-effect text-center m-b-20">LOGIN</button>
+                                        </div>
+                                    </div>
+                            </div>
+                        </form>
+                        <!-- end of form -->
+                    </div>
+                    <!-- Authentication card end -->
+                </div>
+                <!-- end of col-sm-12 -->
+            </div>
+            <!-- end of row -->
+        </div>
+        <!-- end of container-fluid -->
+    </section>
+    <!-- Warning Section Starts -->
+    <!-- Older IE warning message -->
+    <!--[if lt IE 9]>
+<![endif]-->
+    <!-- Warning Section Ends -->
+    <!-- Required Jquery -->
+    <script type="text/javascript" src="{{ asset('bower_components/jquery/js/jquery.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/jquery-ui/js/jquery-ui.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/popper.js/js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/bootstrap/js/bootstrap.min.js') }}"></script>
+    <!-- jquery slimscroll js -->
+    <script type="text/javascript" src="{{ asset('bower_components/jquery-slimscroll/js/jquery.slimscroll.js') }}"></script>
+    <!-- modernizr js -->
+    <script type="text/javascript" src="{{ asset('bower_components/modernizr/js/modernizr.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/modernizr/js/css-scrollbars.js') }}"></script>
+    <!-- i18next.min.js -->
+    <script type="text/javascript" src="{{ asset('bower_components/i18next/js/i18next.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/i18next-xhr-backend/js/i18nextXHRBackend.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/i18next-browser-languagedetector/js/i18nextBrowserLanguageDetector.min.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bower_components/jquery-i18next/js/jquery-i18next.min.js') }}"></script>
+
+</body>
+</html> #}
+ 
+<html lang="fr">
+
+<head>
+    <title>INS GUINEE RGPH-4: authentification</title>
+    <!-- HTML5 Shim and Respond.js IE9 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+      <![endif]-->
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="pigor">
+    <meta name="keywords" content=", pigor,ANSD">
+    <meta name="author" content="ANSD">
+    <!-- Favicon icon -->
+
+    <link rel="icon" href="{{ asset('dist/assets/images/favicon.ico') }}" type="image/x-icon">
+    <link href="{{ asset('dist/main.8d288f825d8dffbbe55e.css') }}" rel="stylesheet">
+
+    <style>
+        .login-block {
+            display: block;
+            background: #DE6262;
+            /* fallback for old browsers */
+            background: -webkit-linear-gradient(to bottom, #FFB88C, #DE6262);
+            /* Chrome 10-25, Safari 5.1-6 */
+            background: linear-gradient(to bottom, #FFB88C, #DE6262);
+            /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+            float: left;
+            width: 100%;
+        }
+        
+    </style>
+
+</head>
+
+<body class="fix-menu">
+    <div class="login-block">
+        <div class="app-container app-theme-white body-tabs-shadow" style="border-radius:10px; box-shadow: 15px 20px 0px rgba(0, 0, 0, 0.1);">
+            <div class="app-container">
+                    <div class="h-100">
+                        <div class="h-100 no-gutters row">
+                            <div class="h-100 d-flex justify-content-center align-items-center col-md-12 col-lg-4" style="background-color:#fff">
+                                <div class="mx-auto app-login-box col-sm-12 col-md-10 col-lg-9" style="padding-right: 0px; padding-left: 0px;">
+                                    <div class="text-center">
+                                        <img src="{{ asset('dist/img/logo_ANSD.png') }}" style="width: 35%;" alt="logo_rgph5">
+                                    </div><br><br>
+                                    <h4 class="mb-0 text-center" style="font-family: Roboto;font-weight: 400;">
+                                        <span class="d-block">INS GUINEE RGPH-4</span>
+                                        <span>Authentification</span></h4>
+                                    <div class="divider row"></div>
+                                    <div>
+                                        <form class="" method="post" action="{{ path('app_login') }}">
+
+
+ 
+                                            {% for message in app.flashes('danger')  %}
+                                                <div class="flash-notice alert alert-danger">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %}
+                                            {# {% for message in app.flashes('warning')  %}
+                                                <div class="flash-notice alert alert-warning">
+                                                    {{ message }}
+                                                </div>
+                                            {% endfor %} #}
+                                            <div class="form-row">
+                                                <div class="col-md-12">
+                                                    <div class="position-relative form-group">
+                                                        <label for="username_user" class="" style="font-family: Roboto;font-weight: 400;">LOGIN</label>
+                                                        <input type="text" class="form-control" placeholder="login" name="username" value="{{last_username}}">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-row">
+                                                <div class="col-md-12">
+                                                    <div class="position-relative form-group">
+                                                        <label for="password_user" class="" style="font-family: Roboto;font-weight: 400;">MOT DE PASSE</label>
+                                                        <input type="password" class="form-control" placeholder="Password" name="password">
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <input type="hidden" name="_target_path" value="index" />
+                                            <input type="hidden" name="_target_path" value="{{ app.request.get('redirect_to') }}"/>
+					                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+
+                                            <div class="divider row"></div>
+                                            <div class="text-center">
+                                                <button style="font-family: Roboto;font-weight: 400;" type="submit" class="btn btn-secondary btn-lg text-center">CONNEXION</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="d-none d-lg-block col-lg-8">
+                                <div class="slider-light">
+                                    <div class="slick-slider">
+                                        <div class="position-relative h-100 d-flex justify-content-center align-items-center bg-white" tabindex="-1">
+                                            <div class="slide-img-bg" style="background-image: url('{{ asset('dist/img/Logo_rgph5_celcom_pigor.jpg') }}'); background-size: 100% 100%; background-repeat: no-repeat; background-position: center ; opacity:0.8">
+                                                <div class="center">
+                                                    <img src="{{ asset('dist/img/logo_rgph5_trans.png') }}" style="width: 15%;" alt="logo_rgph5" class="pull-right mr-2 pt-2">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+<script type="text/javascript" src="{{ asset('dist/main.8d288f825d8dffbbe55e.js') }}"></script></body>
+</html>

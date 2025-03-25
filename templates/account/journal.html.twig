@@ -1,0 +1,144 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Journals des actions{% endblock %}
+{% block stylesheet %}
+    {{ parent() }}
+    <link rel="stylesheet" type="text/css" href="{{ asset('dist/assets/jsonTree/jsonTree.css')  }}">
+    <style>
+        tr.success {
+            background-color: #04fd045e !important;
+        }
+        tr.failed {
+            background-color: #fd04335e !important;
+        }
+       
+    </style>
+{% endblock stylesheet %}
+
+{% block body %}
+<div class="page-wrapper">                                    
+    <div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        
+                    </div>
+                    <div class="card-block">
+                        {% for label, messages in app.flashes %}
+                            <div class="alert bg-{{ label }} text-center" style="height: 50px">
+                                {% for message in messages %}
+                                    <p>{{ message | raw }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="table-responsive dt-responsive">
+                            <table id="dt-cavs" class="table table-striped table-bordered nowrap">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Actions</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+    <script src="{{ asset('dist/assets/jsonTree/jsonTree.js') }}"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+           
+            
+            $('#dt-cavs thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+            $('#dt-cavs').DataTable({
+                "rowCallback": function( row, data, index ) {
+                    $(row).addClass(data.action);
+                  },
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/en-gb.json'
+                },
+                "ajax": "{{ path('get_journal_actions') }}?user={{ app.request.get('user') }}&objectClass={{ app.request.get('objectClass')}}&objectId={{ app.request.get('objectId') }}",
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20,10, 25, 50, 100],
+                "columns": [
+                        { 'data': 'data' , render: function (data, type, journal) {
+                            var routeObject = encodeURI(Routing.generate('get_journal_actions')+"?objectClass="+journal.objectClass+'&objectId='+journal.objectId) ;
+                            
+                            return `
+                            <li class="media">
+                            <div class="media-left" title="Cliquer Ici pour filter les Actions de l'utilisateur  ${journal.username} uniquement">
+                                <a id="link_by_user_${journal.id}" href="${Routing.generate('get_journal_actions', {'user':journal.username})}">
+                                    <img class="media-object img-circle comment-img" src="{{ asset('dist/assets/images/blog/blog-130.png') }}" alt="Generic placeholder image">
+                                </a>
+                            </div>
+                            <div class="media-body blog-s-reply">
+                                <h6 title="Cliquer Ici pour filter les Actions de l'utilisateur  ${journal.username} uniquement" style="cursor:pointer" class="media-heading" onclick="document.location.href =$('#link_by_user_${journal.id}').attr('href') " >${journal.username}<span>${journal.loggedAt}</span> </h6>
+                                <p>
+                                    ${journal.action == 'create'?'Création de ': (journal.action== 'update'?'Modification de': (journal.action =='failed' ? 'Authentification Echoué' :(journal.action == 'success' ? ' Authentification Reussi ': journal.action )  )) } 
+                                    
+                                    <a style="font-size:1rem; color: #1abc9c;"  href="${['success','failed'].indexOf(journal.action) == -1 ? routeObject : '#' }">${journal.objectClass}[${journal.objectId}]</a>  <br/>
+                                    <span  class="jsonTree">  ${journal.data == null ? {} : journal.data } </span>
+                                </p>
+                            </div>
+                        </li>`;
+                           
+                        } 
+                    },
+                      
+                        
+                    ],
+                initComplete: function () {
+                        // Apply the search
+                        this.api().columns().every( function () {
+                            var that = this;
+             
+                            $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                                if (e.keyCode == 13 &&  that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            } );
+                        } );
+                    },
+                    drawCallback: function(settings){
+                        var jsonTrees = document.getElementsByClassName('jsonTree');
+                        for(var i=0; i< jsonTrees.length;i++){
+                         var wrapper = jsonTrees[i];
+                         try {
+                             var data = JSON.parse(wrapper.textContent);
+                             wrapper.textContent= '';
+                             var tree = jsonTree.create(data, wrapper);
+                         }catch (e) {} 
+                           
+                        }
+
+                    }
+            });
+
+           
+
+           
+
+        });
+        
+ 
+    </script>
+{% endblock javascript %}
+

@@ -1,0 +1,383 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    Liste de présence du {{ presentiel.dayAt|date('d/m/Y') }} | {{ presentiel.supervisor.username }} 
+{% endblock %}
+
+{% block body %}
+
+<div class="page-wrapper">   
+    <div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-block">
+                        {# Nav #}
+                        <ul class="nav nav-tabs  tabs" role="tablist">
+                            <li class="nav-item col">
+                                <a class="nav-link active" data-toggle="tab" href="#concTab" role="tab">Présences</a>
+                            </li>
+                            <li class="nav-item col">
+                                <a class="nav-link" data-toggle="tab" href="#menTab" role="tab">Feuilles de présence</a>
+                            </li>
+                        </ul>
+                        {# /Nav #}
+
+                        {# Tabs #}
+                        <div class="tab-content tabs card-block">
+
+                            <div class="tab-pane active" id="concTab" role="tabpanel">
+                                <p class="m-0">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="card">
+                                                <div class="card-block">
+                                                    <div class="table-responsive">
+                                                        <table id="usersDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">Prénom(s)</th>
+                                                                    <th scope="col">Nom</th>
+                                                                    <th scope="col">Age</th>
+                                                                    <th scope="col">Est présent ? 
+                                                                        {# <div>  
+                                                                            Est présent ? 
+                                                                            <input  
+                                                                                    id="checkAll" 
+                                                                                    class="statut-all"
+                                                                                    type="checkbox" 
+                                                                                    class="js-small" 
+                                                                                />
+                                                                        </div> #}
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+
+                            <div class="tab-pane" id="menTab" role="tabpanel">
+                                <p class="m-0">
+                                    <div class="col-xl-12">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="">
+                                                    <form method="post" enctype="multipart/form-data" id="form-import-centroideP">
+                                                        <div class="form-group row">
+                                                            <div class="col-md-8">
+                                                                <input type="file" class="form-control" id="upload" name="_file" class="form-control" required>
+                                                            </div>
+                                                            <div class="col-md-4 pt-2">
+                                                                <a  href="javascript:void(0);" 
+                                                                    class="btn-primary btn-sm" 
+                                                                    id="clearBtn">
+                                                                    Vider le champ
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="table-responsive">
+                                                    <table id="filesDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col"></th>
+                                                                <th scope="col">Feuille de présence</th>
+                                                                <th scope="col">Télécharger</th>                                            
+                                                                <th scope="col">Retirez</th>                                            
+                                                            </tr>
+                                                        </thead>
+                                                    </table>
+                                                </div>                                              
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+                          
+                        </div>
+                        {# /Tabs #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    <script>
+        var tableDt, filesDt;
+        $(document).ready(function(){
+
+            const SLUG = "{{ presentiel.slug }}";
+            const totalAbsence = parseInt("{{ presentiel.totalAbsence }}");
+
+            $('a[data-toggle="tab"]').click(function(){
+                let hrefVal = $(this).attr('href');
+
+                switch(hrefVal) {
+                    case '#concTab':
+                        $('#concTab').show();
+                        $('#menTab').hide();
+                        break;
+                    case '#menTab':
+                        $('#menTab').show();
+                        $('#concTab').hide();
+                        break;
+                    default:
+                        // code block
+                }
+            });
+
+            if (totalAbsence == 0) {
+                $('#checkAll').prop('checked', true);
+            }
+           
+            $('#usersDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+            tableDt = $('#usersDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_sp_day_presentiel', {slug: SLUG}),
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10, 20, 25, 50, 100],
+                //"order": [[ 0, "desc" ]],
+                "columns": [
+                        { "data": "id", "visible": false },
+                        { "data": "enumerator.name", sortable: false },
+                        { "data": "enumerator.surname", sortable: false },
+                        { sortable: false, orderable: false, "render": (data,type,row, meta) => {
+                            return `${row.enumerator.age} ans`;
+                        }},
+                        { 'data':'isPresent', 'render': function(data, type,row) { 
+                                return `<input  data-names="${row.enumerator.name} ${row.enumerator.surname}"  
+                                                data-slug="${row.id}" 
+                                                class="statut-presence" 
+                                                id="statut-presence${row.id}" 
+                                                type="checkbox" 
+                                                class="js-small" ${row.isPresent ? 'checked':''} />`; 
+                            } 
+                        },
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                        $('select', this.header() ).on( 'change', function (e) {
+                            if (that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });   
+                    });
+                },
+                drawCallback: function(settings){
+                    if($("#usersDt_filter").length){
+                        $("#usersDt_filter").hide();
+                    }
+
+                    document.querySelectorAll('.statut-presence').forEach(function(elmt){
+                        var switchery = new Switchery(elmt, { color: '#1abc9c', jackColor: '#fff' });
+                    });
+                }        
+            });
+
+            $(document).on ("change", ".statut-presence", function (){
+                var  myCheckbox= $(this)[0];
+                var newValue = $(this)[0].checked;
+                let delVal = newValue ? 1 : 0;
+
+                var slug = $(this).data('slug');
+
+                $.ajax({
+                    type: "POST",
+                    url: Routing.generate('app_presence_save', {'id': slug, status: delVal}),
+                    success: function (response) {
+                       tableDt.ajax.reload();
+                    },
+                    error: function (response) {
+                    }
+                });
+
+            });
+
+            // check/unckeck all
+            $(document).on ("change", "#checkAll", function (){
+                var  myCheckbox= $(this)[0];
+                var newValue = $(this)[0].checked;
+                let delVal = newValue ? 1 : 0;
+
+                $.ajax({
+                    type: "POST",
+                    url: Routing.generate('app_presence_save_all', {'slug': SLUG, status: delVal}),
+                    success: function (response) {
+                       tableDt.ajax.reload();
+                    },
+                    error: function (response) {
+                    }
+                });
+
+            });
+
+            // -------------- Files -----------------//
+            filesDt = $('#filesDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_presentiel_files', {slug: SLUG}),
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 10,
+                //"lengthMenu": [ 10, 20, 25, 50, 100],
+                "order": [[ 0, "asc" ]],
+                "columns": [
+                    { "data": "id", "visible": false },
+                    { "data": "fileName" },
+                    { sortable: false ,"render" : (data,type,row, meta)=> {
+                        let file_download_url = Routing.generate('app_presentiel_file_download', {slug: row.slug});
+                        return `<a href="${file_download_url}" target="_blank"
+                                ><i class="fa fa-download"></i>
+                            </a>`;
+                    }},
+                    { sortable: false ,"render" : (data,type,row, meta)=> {
+                        return `<button class="deleteFile bg-danger" 
+                                    data-id="${row.id}" 
+                                >X</i>
+                            </button>`;
+                    }},
+                ],
+                drawCallback: function(settings){
+                    if($("#filesDt_filter").length){
+                        $("#filesDt_filter").hide();
+                    }
+                }        
+            });
+
+            
+            $('#upload').change(function(){
+
+                // récupère le fichier
+                var file_data = $('#upload').prop('files')[0];   
+                var form_data = new FormData();                  
+                form_data.append('file', file_data);
+
+                var isnotxls = isExcelFile(file_data);
+                if(isnotxls){
+                    Swal.fire(
+                        'Attention !',
+                        `Seules ces extensions de fichiers ci-après sont autorisées: ["jpeg", "jpg", "png", "gif", "pdf"]`,
+                        'info'
+                    );
+                    return;
+                }
+
+                jQuery.ajax({
+                    url: Routing.generate('app_presentiel_file_upload', {slug: SLUG}),
+                    data: form_data,
+                    beforeSend: function(){
+                        $('.censusmp-loader').show();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST', // For jQuery < 1.9
+                    success: function(response){
+                        $('.censusmp-loader').hide();   
+                        filesDt.ajax.reload();                   
+                    }, error (status, text) {
+                        console.error(status)
+                        $('.censusmp-loader').hide();   
+                        
+                        Swal.fire(
+                            'Attention !',
+                             status.responseJSON,
+                            'error'
+                        );
+                    }
+                });
+            });
+
+            function isExcelFile(file) {
+
+                var originalFileName = file['name'];
+
+                var ext = originalFileName.split(".");
+                ext = ext[ext.length-1].toLowerCase();      
+                var arrayExtensions = ["jpeg", "jpg", "png", "gif", "pdf"];
+
+                if (arrayExtensions.lastIndexOf(ext) == -1) {
+                    return true;
+                }
+                return false;
+            }
+
+            $("#clearBtn").click(function(){
+               $("#upload").replaceWith($("#upload").val('').clone(true));
+            });
+
+            $(document).on ("click", ".deleteFile", function (){
+
+                let id = $(this).data('id');
+                if(!id) {
+                    return;
+                }
+
+                var deleteAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_presentiel_file_remove', {id: id }),
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('.censusmp-loader').hide();
+                                filesDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de supprimer cette feuille de présence ?`,'Suppression feuille présence réussie', '', deleteAction).then(function(){
+                    //zcDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,336 @@
+{% extends "base.html.twig" %}
+
+{% block title %} {{ title }}  {% endblock %}
+
+{% block body %}
+
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-block">
+                    {# tab #}
+                    <div class="row">
+                        <div class="col-lg-12 col-xl-12">
+                            {# <div class="sub-title">Default</div>                                         #}
+                            <!-- Nav tabs -->
+                            <ul class="nav nav-tabs  tabs" role="tablist">
+                                <li class="nav-item">
+                                    <a class="nav-link active" data-toggle="tab" href="#home1" role="tab">Main list</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#profile1" role="tab">Waiting list</a>
+                                </li>
+                            </ul>
+                            <!-- Tab panes -->
+                            <div class="tab-content tabs card-block">
+                                {# Main list #}
+                                <div class="tab-pane active" id="home1" role="tabpanel">
+                                    <p class="m-0">
+                                        <div class="table-responsive dt-responsive">
+                                            <table id="dt-Candidateures" class="table table-striped table-bordered nowrap" style="width: 100%;">
+                                                <thead>
+                                                    <tr>  
+                                                        <th scope="col">Score </th>
+                                                        <th scope="col">Submission number</th>
+                                                        <th scope="col">In the training ?</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Surname</th>
+                                                        <th scope="col">Phone</th>
+                                                        <th scope="col">Lga</th>
+                                                        <th scope="col">Posting district</th>
+                                                        <th scope="col">Work district</th>
+                                                        <th scope="col">Date of birth</th>
+                                                        <th scope="col">Last diploma</th>
+                                                        <th scope="col">Computer knowledge</th>
+                                                        <th scope="col">Census or Survey</th>
+                                                        <th scope="col">Use of tablet</th>
+                                                        <th scope="col">Candidate</th>
+                                                    </tr>
+                                                    <tr>
+                                                       <th scope="col">Score </th>
+                                                        <th scope="col">Submission number</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Surname</th>
+                                                        <th scope="col">Phone</th>
+                                                        <th scope="col">Lga</th>
+                                                        <th scope="col">Posting district</th>
+                                                        <th scope="col">Work district</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col"></th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>  
+                                    </p>
+                                </div>
+                                {# Liste attente #}
+                                <div class="tab-pane" id="profile1" role="tabpanel">
+                                    <p class="m-0">
+                                        <div class="table-responsive dt-responsive">
+                                            <table id="dt-attente" class="table table-striped table-bordered nowrap" style="width: 100%;">
+                                                <thead>
+                                                    <tr>  
+                                                        <th scope="col">Score</th>
+                                                        <th scope="col">Submission number</th>
+                                                        <th scope="col">In the training ?</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Surname</th>
+                                                        <th scope="col">Phone</th>
+                                                        <th scope="col">Lga</th>
+                                                        <th scope="col">Posting district</th>
+                                                        <th scope="col">Work district</th>
+                                                        <th scope="col">Date of birth</th>
+                                                        <th scope="col">Last diploma</th>
+                                                        <th scope="col" title="Computer knowledge">Computer knowledge</th>
+                                                        <th scope="col">Census or Survey</th>
+                                                        <th scope="col">Use of tablet</th>
+                                                        <th scope="col">Candidate</th>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="col">Score</th>
+                                                        <th scope="col">Submission number</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">Surname</th>
+                                                        <th scope="col">Phone</th>
+                                                        <th scope="col">Lga</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Work district</th>
+                                                        <th scope="col"></th>
+                                                        <th scope="col">Last diploma</th>
+                                                        <th scope="col">Computer knowledge</th>
+                                                        <th scope="col">Census or Survey</th>
+                                                        <th scope="col">Use of tablet</th>
+                                                        <th scope="col">Candidate</th>
+                                                    </tr>
+                                                </thead>
+                                            </table>
+                                        </div>  
+                                    </p>
+                                </div>
+                                {# /Liste attente #}
+                            </div>
+                        </div>
+                    </div>
+                    {# /tab #}
+                                          
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+
+    <script>
+                
+        $(document).ready(function(){
+
+            // -------------------- LISTE ATTENTE -------------------- //
+            $('#dt-attente thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title == "Is available") {
+                     $(this).html( `<select  class="form-control form-control-xs" size="height:none">
+                                        <option value="">Display all</option>
+                                        <option value="1">YES</option>
+                                    </select>    
+                    `);
+                } else if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Search '+title+'" />' );
+                }
+            });
+            
+            var index_url = Routing.generate('app_candidats_lga_waiting', {id: "{{ app.user.lga.id }}" });
+            var usersDtAttente = $('#dt-attente').DataTable({
+                select: true,
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },
+                "serverSide": true,
+                //"fixedHeader": true,
+                "processing": true,    
+                "ajax": `${index_url}`,
+                "paging": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20, 25, 50, 100],
+                "order": [[ 0, 'desc' ]],
+                "columns": [
+                       
+                    { "data": "score", "orderable": true },
+                    {"data": "submission_number"},
+                    {'data': 'isAffected', 'render': function(data,type,row){
+                        return row.isAffected ? `<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                        }
+                    },
+                    { "data": "name" },
+                    { "data": "surname" },
+                    { "data": "phone" },
+                    {"data": "lga.name",'default': ''},
+                    {"data": "disrict.name",'default': ''},
+                    {"data": "workDistrict.name",'default': '','render': function(data,type,row) { return row.workDistrict.name;  } },
+                    {"data": "birthDate"},
+                    {"data": "diploma"},
+                    {'data': 'computer_knowledge', 'render': function(data,type,row){
+                                        return row.computer_knowledge?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                                }
+                    },
+                    {'data': 'census_or_survey', 'render': function(data,type,row){
+                        return row.census_or_survey?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                            }
+                    },
+                    {'data': 'use_of_tablet', 'render': function(data,type,row){
+                        return row.use_of_tablet?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                            }
+                    },
+
+                    {'default': '', 'render': function(data,type,row){
+                        var url = Routing.generate('app_Candidats_detail', { id: row.id });
+                        return ` <a   class='btn btn-default btn-xs waves-effect waves-light' href="${url}">  <i  style="font-size:16px;margin-left: 30%; cursor:pointer " class="ti-id-badge"></i></a>`; 
+                            }
+                    }
+                    
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                               // alert( this.value )
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                        $('select', this.header() ).on( 'change', function (e) {
+                            if (that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                    });
+                },
+                rowCallback: function (row, data) {
+                    /*if (data.confirmation != 1) {
+                        $(row).css('background-color', '#baadad');
+                    }*/
+                },
+                drawCallback: function(settings){
+                    $("#dt-attente_filter").hide();
+                }        
+            });
+
+
+             $('#dt-Candidateures thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                /*if (title == "Is available") {
+                     $(this).html( `<select  class="form-control form-control-xs" size="height:none">
+                                        <option value="" selected>Tout afficher</option>
+                                        <option value="1">YES</option>
+                                    </select>    
+                    `);
+                } else */
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Search '+title+'" />' );
+                }
+            });
+
+            let lpUrl = Routing.generate('app_candidats_district_formation', {id: "{{ app.user.lga.id }}" });
+            var usersDt = $('#dt-Candidateures').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },
+                "serverSide": true,
+                "processing": true,    
+                "ajax": lpUrl,
+                "paging": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20, 25, 50, 100],
+                "order": [[ 0, 'desc' ]],
+                "columns": [
+                       
+                    { "data": "score", "orderable": true },
+                    { "data": "submission_number"},
+                    { 'data': 'isAffected', 'render': function(data,type,row){
+                        return row.isAffected ? `<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                        }
+                    },
+                    { "data": "name" },
+                    { "data": "surname" },
+                    { "data": "phone" },
+                    {"data": "lga.name",'default': ''},
+                    {"data": "district.name",'default': '', 'orderable': false, 'render': function(data,type,row) { return row.district.name;  } },
+                    {"data": "workDistrict.name",'default': '','render': function(data,type,row) { return  row.workDistrict.name;  } },
+                    {"data": "birthDate"},
+                    {"data": "diploma"},
+                    {'data': 'computer_knowledge', 'render': function(data,type,row){
+                            return row.computer_knowledge?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                        }
+                    },
+                    {'data': 'census_or_survey', 'render': function(data,type,row){
+                        return row.census_or_survey?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                            }
+                    },
+                    {'data': 'use_of_tablet', 'render': function(data,type,row){
+                        return row.use_of_tablet?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                            }
+                    },
+                    {'default': '', 'render': function(data,type,row){
+                        var url = Routing.generate('app_Candidats_detail', { id: row.id });
+                        return ` <a   class='btn btn-default btn-xs waves-effect waves-light' href="${url}">  <i  style="font-size:16px;margin-left: 30%; cursor:pointer " class="ti-id-badge"></i></a>`; 
+                            }
+                    }
+                    
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                        $('select', this.header() ).on( 'change', function (e) {
+                            if (that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                    } );
+                },
+                rowCallback: function (row, data) {
+                    /*if (data.confirmation != 1) {
+                        $(row).css('background-color', '#baadad');
+                    }*/
+                },
+                drawCallback: function(settings){
+                    $("#dt-Candidateures_filter").hide();                    
+                }        
+            });
+
+        });
+
+
+    </script>
+{% endblock %}
+

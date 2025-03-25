@@ -1,0 +1,447 @@
+{% extends "base.html.twig" %}
+
+{% block title %} Superviseurs {% endblock %}
+
+
+{% block body %}
+
+<div class="page-wrapper">
+	<div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-block">
+                        {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card-block accordion-block">
+                                    <div id="accordion" role="tablist" aria-multiselectable="true">
+                                        <div class="accordion-panel">
+                                            <div class="accordion-heading" role="tab" id="sp">
+                                                {# <h3 class="card-title accordion-title"> #}
+                                                    <a  class="btn btn-success btn-icon" 
+                                                        style="background: #1ABC9C !important"
+                                                        data-toggle="collapse" 
+                                                        data-parent="#accordion" href="#collapsesp" 
+                                                        aria-expanded="true" 
+                                                        aria-controls="collapsesp">
+                                                        &nbsp;<i class="icofont icofont-plus"></i>
+                                                    </a> Nouveau superviseur
+                                                {# </h3>  #}
+                                            </div>
+                                            <div id="collapsesp" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="sp">
+                                                <div class="accordion-content accordion-desc">
+                                                    <form action=""  method="POST" id="myForm">
+                                                        <div class="form-group row">
+                                                            <input type="hidden" id="slug" />
+                                                            <div class="col-md-3">
+                                                                <label class="col-form-label" for="lga">LGA<span class="text-danger">*</span></label>
+                                                                <select class="form-control input-sm" id="lga">
+                                                                    <option value="">Choisir sa localité</option>
+                                                                    {% for lga in lgas %}
+                                                                        <option value="{{ lga.id }}">{{ lga.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                            </div>
+                                                            <div class="col-md-3">
+                                                                <label class="col-form-label" for="firstName">Prénom(s)<span class="text-danger">*</span></label>
+                                                                <input type="text" 
+                                                                        class="form-control input-sm" 
+                                                                        id="firstName" 
+                                                                >
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label" for="lastName">Nom<span class="text-danger">*</span></label>
+                                                                <input type="text" 
+                                                                        class="form-control input-sm" 
+                                                                        id="lastName" 
+                                                                >
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <label class="col-form-label" for="phone">Téléphone<span class="text-danger">*</span></label>
+                                                                <input type="number" 
+                                                                        class="form-control input-sm" 
+                                                                        id="phone" 
+                                                                >
+                                                            </div>
+                                                            <div class="col-md-2 pt-2">
+                                                                <br/><button class="btn btn-primary btn-outline-primary btn-sm" 
+                                                                    id="btnAddSp">
+                                                                    AJOUTER <i class="icofont icofont-user-alt-3"></i>
+                                                                </button>
+                                                                <button type="reset" class="btn btn-primary btn-outline-primary btn-sm" 
+                                                                    id="btnClean">
+                                                                    Reset <i class="icofont icofont-clean-alt-3"></i>
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        <div class="pt-3">
+                            <div class="table-responsive">
+                                <table id="usersDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">LGA</th>
+                                            <th scope="col">Prénom(s)</th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Téléphone</th>
+                                            <th scope="col">Paramètres</th>
+                                            <th scope="col">Formation</th>
+                                            <th scope="col">Equipe</th>
+                                            <th scope="col">Lancer collecte</th>
+                                            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                            <th scope="col">Actions</th>
+                                            {% endif %}
+                                        </tr>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">LGA</th>
+                                            <th scope="col">Prénom(s)</th>
+                                            <th scope="col">Nom</th>
+                                            <th scope="col">Téléphone</th>
+                                            <th scope="col">Paramètres</th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                            <th scope="col"></th>
+                                            {% endif %}
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    
+    <script type="text/javascript" src="{{ asset('dist/js/multiselect.js') }}"></script>
+
+    <script>
+        var myDt;
+        $(document).ready(function(){
+
+            $('#firstName').focus();
+
+            const PROJECT_ID = "";
+            const PROJECT_NAME = "";
+
+            //$(".sidebar_toggle > a:first").trigger('click');
+
+            // -------- TAB 1 -------------------
+            $('#usersDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+            myDt = $('#usersDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_users_superviseurs'),
+                //'dom': 'lrt',
+                //'searching': false,
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                //"bInfo" : false,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20, 25, 50, 100],
+                "order": [[ 0, "desc" ]],
+               // "responsive": true,
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    },
+                ],
+                "columns": [
+                    { "data": "id" },
+                    { "data": "lga.name" },
+                    { "data": "name" },
+                    { "data": "surname" },
+                    { "data": "phone" },
+                    { "data": "username", "render": (data,type,row, meta) => {
+                        return `${row.username} | ${row.passwordView}`;
+                    }},
+                    { "data": "username", "render": (data,type,row, meta) => {
+                        let exportUrl = Routing.generate('export_sp_salle_candidats', {slug: row.slug});
+                        let classRoomUrl = Routing.generate('app_sp_team', {slug: row.slug});
+                        let downloadDom = ``;
+
+                        if (row.cptEnumerators > 0) {
+                            downloadDom = `<a href="${exportUrl}" title="Enumerators list">
+                                                <i class="fa fa-download"></i>
+                                            </a>`;
+                        }
+                        return `${row.cptEnumerators} <a href="${classRoomUrl}" title="accédez au module formation">
+                            <i class="fa fa-mortar-board"></i>
+                        </a>${downloadDom}`;
+                    }},
+                    { "data": "username", "render": (data,type,row, meta) => {
+                        let classRoomUrl = Routing.generate('sp_final_enumerators', {slug: row.slug});
+                        if (row.cptProfile > 0){
+                            return `${row.cptProfile} <a href="${classRoomUrl}" title="Enumerators">
+                                <i class="fa fa-users"></i>
+                            </a>`;
+                        } else {
+                            return `${row.cptProfile}`;
+                        }
+                    }},
+                    { className: 'text-center', sortable: false, "render" : (data,type,row, meta)=> {
+                        if(row.cptProfile > 0) {
+                            return `<button class="btn btn-${row.checkcsPro} btn-sm startCollecte" 
+                                        data-slug="${row.slug}" 
+                                        data-username="${row.username}"
+                                        data-chefeq="${row.name} ${row.surname}"
+                                        data-up=""
+                                    > <i class="fa fa-play"></i>
+                                </button>&nbsp;
+                                `;
+                        } else {
+                            return "";
+                        }
+                    }},
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                    { sortable: false ,"render" : (data,type,row, meta)=> {
+                            return `<button class="edit-button-class"
+                                        data-id="${row.slug}" 
+                                        data-prenom="${row.name}"
+                                        data-nom="${row.surname}"
+                                        data-phone="${row.phone}"
+                                        data-lga="${row.lga.id}"
+                                    > <i class="fa fa-pencil"></i>
+                                    </button>
+                                    <button class="del-button-class bg-danger" 
+                                            data-id="${row.slug}" 
+                                            data-prenom="${row.name}"
+                                            data-nom="${row.surname}"
+                                            ${row.cptEnumerators > 0 ? 'hidden' : ''}
+                                        > <i class="fa fa-trash"></i>
+                                    </button>
+                            `;
+                        }
+                    },
+                    {% endif %}
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });                                    
+
+                    });
+                },
+                rowCallback: function (row, data) {
+                    //console.log(data)
+                },
+                drawCallback: function(settings){
+                    $("#usersDt_filter").hide();
+                },    
+            });
+
+            $('#myForm').submit(function(e){
+                e.preventDefault();
+            });
+
+            $('#btnAddSp').click(function(){
+
+                
+                let firstName = $('#firstName').val();
+                let lastName = $('#lastName').val();
+                let phone = $('#phone').val();
+                let lga = $('#lga').val();
+
+                if (!firstName || !lastName || !phone || !lga) {
+                    return;
+                }
+
+                $(this).prop('disabled', true);
+
+                var addAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_users_superviseurs_save'),
+                            data: {
+                                '_firstName': firstName, 
+                                '_lastName': lastName, 
+                                '_phone': phone, 
+                                '_lga': lga, 
+                                '_slug': $('#slug').val()
+                            },
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('#btnAddSp').removeAttr('disabled');
+                                $('.censusmp-loader').hide();
+                                $('#slug').val("");
+                                $('#firstName').val("");
+                                $('#lastName').val("");
+                                $('#phone').val("");
+                                $('#btnAddSp').html("AJOUTER <i class='icofont icofont-user-alt-3'></i>");
+                                $('#firstName').focus();
+
+                                $('#lga option:first').prop('selected', true);
+
+                                myDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('#btnAddSp').removeAttr('disabled');
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                                Swal.fire(
+                                    'Erreur ajout superviseur' ,
+                                    status.responseText,
+                                    'error'
+                                );
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de confirmre cet ajout ?`,'Ajout superviseur réussi', '', addAction).then(function(){
+                    zcDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+
+            $('#btnClean').click(function(){
+                $('#slug').val("");
+                $('#btnAddSp').html('AJOUTER <i class="icofont icofont-user-alt-3"></i>');
+            })
+
+            $(document).on ("click", ".edit-button-class", function (){
+                
+                let id = $(this).data('id');
+                if(!id) {
+                    return;
+                }
+                let prenom = $(this).data('prenom');
+                let nom = $(this).data('nom');
+                let phone = $(this).data('phone');               
+                let lga = $(this).data('lga');               
+
+                $("#slug").val(id)
+                $('#firstName').val(prenom);
+                $('#lastName').val(nom);
+                $('#phone').val(phone);
+
+                $('#lga').prop('selected', false);
+                $('#lga > option').each(function(e){
+                    if (this.value == lga) {
+                        $(this).prop('selected', true);
+                    }
+                });
+
+                $('#btnAddSp').html("MODIDIER <i class='icofont icofont-user-alt-3'></i>");
+                $('#collapsesp').collapse();
+
+            });
+
+            $(document).on ("click", ".del-button-class", function (){
+
+                let slug = $(this).data('id');
+                if(!slug) {
+                    return;
+                }
+                let prenom = $(this).data('prenom');
+                let nom = $(this).data('nom');
+
+                var deleteAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_users_superviseurs_remove', {slug: slug }),
+                            dataType: "json",
+                            method: "GET",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('.censusmp-loader').hide();
+                                myDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de supprimer le superviseur ${prenom} ${nom} ?`,'Suppression superviseur réussie', '', deleteAction).then(function(){
+                    //zcDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+
+            $(document).on("click", ".startCollecte", function (){
+                
+                let slug = $(this).data('slug');
+                let userName = $(this).data('username');
+                let ceNames = $(this).data('chefeq');
+
+                var runCollecteAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            type: "GET",
+                            url: Routing.generate('app_start_census', {slug: slug }),
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (response) {
+                                $('.censusmp-loader').hide();
+                                myDt.ajax.reload();
+                                //resolve();
+                            },
+                            error: function (response) {
+                                $('.censusmp-loader').hide();
+                                reject();
+                            }
+                        });
+
+                    });
+                };
+                confirmationToExecutePromise(`En cliquant sur "Oui" vous lancer la collecte pour l'équipe de ${ceNames} | ${userName} ?`,'Lancement collecte', '', runCollecteAction).then(function(){
+                    //zcDt.ajax.reload();                    
+                });
+
+               return;
+                
+            });
+           
+        });
+    </script>
+
+{% endblock %}

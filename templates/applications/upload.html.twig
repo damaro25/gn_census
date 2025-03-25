@@ -1,0 +1,269 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    Uploading successful candidates {{ title }}
+{% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-block">
+                    <p style="font-size: 15px;"><i class="ti-info"></i> The file to be uploaded must only contain the list of candidates selected after the work of the recruitment committee.</p>
+                    <p style="font-size: 15px;"><i class="ti-info"></i> .</p>
+                    <div class="text-center">
+                        {% for label, messages in app.flashes %}
+                            <div class="alert bg-{{ label }} btn-sm">
+                                {% for message in messages %}
+                                    <p>{{ message | raw }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {# <div class="row">
+                        <div class="col-md-12">
+                            <fieldset class="border p-2">
+                                <legend>
+                                    <h6>
+                                        <p>
+                                            <strong>FICHIER EXCEL</strong> &nbsp;
+                                            <form action="{{ path('app_candidats_retenus_upload', {id: app.user.departement.id}) }}" method="post" enctype="multipart/form-data" id="formulaireID">
+                                                <div class="form-group row">
+                                                    <div class="col-md-6">
+                                                        <input type="file" class="form-control" id="upload" name="file" class="form-control" required>
+                                                    </div>
+                                                    <div class="col-md-4 pt-1">
+                                                        <button class="btn-primary btn-sm" type="submit" id="sendServer">
+                                                            Charger juste les candidats retenus
+                                                        </button>&nbsp;
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </p>
+                                    </h6>
+                                </legend>
+                            </fieldset>
+                        </div>
+                    </div> #}
+                    {# communes #}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive dt-responsive">
+                                <table id="dt_candidatures_reaffectation" class="table table-striped table-bordered table-sm nowrap" style="width: 100%;">
+                                    <thead>
+                                        <tr>  
+                                            <th scope="col">District</th>
+                                            <th scope="col">District code</th>
+                                            <th scope="col">Nbr. Selected</th>
+                                            <th scope="col">Nbr. Expected</th>
+                                            <th scope="col">Main list</th>
+                                            <th scope="col">Waiting list</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for row in districts %}
+                                            <tr>  
+                                                <td>{{ row.name }}</td>
+                                                <td>{{ row.fdcode }}</td>
+                                                <td>
+                                                    <span class="badge-box" style="border-radius: 8px; font-size: 11px;">
+                                                        {{ row.totalSelection }}
+                                                    </span> &nbsp;
+                                                    {% if row.totalSelection > 0 %}
+                                                        <a href='{{ path('app_candidats_district_main', {id: row.id}) }}' title="View main list">
+                                                            <i class='ti-eye'></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <span class="badge-box" style="border-radius: 8px; font-size: 11px;">
+                                                        {{ row.totalReserviste }}
+                                                    </span>&nbsp;
+                                                    {% if row.totalReserviste > 0 %}
+                                                        <a href='{{ path('app_candidats_cacr_reservite', {id: row.id}) }}' title="Voir la liste d'attente">
+                                                            <i class='ti-eye'></i>
+                                                        </a>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <form action="{{ path('app_candidats_retenus_upload', {id: app.user.departement.id}) }}" method="post" enctype="multipart/form-data" class="form-inline formulaireID" id="{{ row.id }}xx">
+                                                        <div class="form-group row">
+                                                            {# <i style="color:red;font-size:16px;" class="ti-na"></i>&nbsp;   #}
+                                                            <input type="hidden" name="mode" value="selectionne" />
+                                                            <input type="hidden" name="cacr" value="{{ row.code }}" />
+                                                            <input type="file" 
+                                                                class="uploadFile" 
+                                                                name="file" 
+                                                            required>
+                                                            {# <button class="btn-primary btn-sm" type="button">
+                                                                    <i class="ti-upload"></i>
+                                                            </button> #}
+                                                        </div>
+                                                    </form>
+                                                </td>
+                                                <td>
+                                                    <form action="{{ path('app_candidats_retenus_upload', {id: app.user.departement.id}) }}" method="post" enctype="multipart/form-data" class="form-inline formulaireID" id="{{ row.id }}xv">
+                                                        {# <i style="color:red;font-size:16px;" class="ti-na"></i>&nbsp;   #}
+                                                        <input type="hidden" name="mode" value="reserviste" />
+                                                        <input type="hidden" name="cacr" value="{{ row.code }}" />
+                                                        <input type="file" 
+                                                            name="file" 
+                                                            class="uploadFile" 
+                                                        required>
+                                                        {# <button class="btn-primary btn-sm" type="button">
+                                                                <i class="ti-upload"></i>
+                                                        </button> #}
+                                                    </form>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>  
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    <script>
+        $(document).ready(function(){
+            
+            $('#dt_candidatures_reaffectation').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },  
+                "pageLength": 50,
+            });
+
+            //$("input[type='file']").css('color', 'transparent');
+            //$("input[type='file']").css('width', '200');
+            /*$('#upload').change(function(){
+
+                // récupère le fichier
+                var file_data = $('#upload').prop('files')[0];   
+                var form_data = new FormData();                  
+                form_data.append('file', file_data);
+
+                var isnotxls = isExcelFile(file_data);
+                if(isnotxls){
+                    Swal.fire(
+                        'Attention !',
+                        `Ce n'est pas un fichier Excel`,
+                        'info'
+                    );
+                    return;
+                }
+
+                let upload_url = Routing.generate('app_candidats_retenus_upload', { id: '{{ app.user.departement.id }}' });
+
+                jQuery.ajax({
+                    url: `${upload_url}`,
+                    data: form_data,
+                    beforeSend: function(){
+                        $('.pigor-loader').show();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST', // For jQuery < 1.9
+                    success: function(response){
+                        $('.pigor-loader').hide();   
+                        
+                        Swal.fire(
+                            'Réussi !',
+                             response,
+                            'success'
+                        );
+                    }, error (status, text) {
+                        console.error(status)
+                        $('.pigor-loader').hide();   
+                        
+                        Swal.fire(
+                            'Attention !',
+                             status.responseJSON,
+                            'error'
+                        );
+                    }
+                });
+            });*/
+
+            /*$('.formulaireID').submit(function(e){
+                e.preventDefault();
+            });*/
+
+            $(".uploadFile").change(function(e){
+                console.log(e)
+
+                var formulaire = $(this).closest('form').attr('id');
+                
+                // récupère le fichier
+                //var file_data = $(this).find('.uploadFile').prop('files')[0];   
+                var file_data = $(this).prop('files')[0];
+
+                var isnotxls = isExcelFile(file_data);
+                if(isnotxls){
+                    Swal.fire(
+                        'Attention !',
+                        `Ce n'est pas un fichier Excel. Veuillez choisir un fichier excel !`,
+                        'info'
+                    );
+                    return;
+                }
+
+                var addAction =  function(){
+                    return new Promise(function(resolve,reject){
+                       $('.pigor-loader').show();
+                       console.log(formulaire)
+                       //$(this).closest("form").submit();
+
+                       $(`#${formulaire}`).submit();
+                    });
+                };
+                confirmationToExecutePromise('Etes-vous sûr de vouloir charger ce fichier ?','Sélection Candidats', 'Sélection réussie', addAction).then(function(){
+                    //$(this).find('.formulaireID').submit(); // Submit the form
+                    $(`#${formulaire}`).submit();
+                });
+            })
+
+            function isExcelFile(file) {
+
+                var originalFileName = file['name'];
+
+                var ext = originalFileName.split(".");
+                ext = ext[ext.length-1].toLowerCase();      
+                var arrayExtensions = ["xls", "xlsx", "csv"];
+
+                if (arrayExtensions.lastIndexOf(ext) == -1) {
+                    return true;
+                }
+                return false;
+            }
+
+            $("#clearBtn").click(function(){
+               $("#upload").replaceWith($("#upload").val('').clone(true));
+            });
+
+            $('#sheetDt tbody').on( 'click', 'tr', function () {
+                $(this).toggleClass('selected');
+                //console.log(tableDt.rows('.selected').data());
+                if(tableDt.rows('.selected').data().length){
+                    $("#supMutipleClass").show();
+                }else {
+                    $("#supMutipleClass").hide();
+                }
+                
+            });
+
+           
+
+        })
+    </script>
+{% endblock %}

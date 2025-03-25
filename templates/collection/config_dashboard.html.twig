@@ -1,0 +1,1149 @@
+{% extends "base.html.twig" %}
+
+{% block title %} COMPOSITION DU TABLEAU DE BORD {% endblock %}
+
+{% block body %}
+
+<div class="page-wrapper">   
+    <div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-header-text">AJOUT DE COMPOSANTS</h5>
+                    </div>
+                    <div class="card-block accordion-block color-accordion-block">
+                        <div class="color-accordion" id="color-accordion">
+                            <a class="accordion-msg bg-primary b-none" tabindex="1"><i class="fa fa-newspaper-o"></i> Widgets</a>
+                            <div class="accordion-desc">
+                                <form autocomplete="off" method="post" id="addWidget">
+                                    <input type="hidden" id="id_widget" name="_id" value="">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Page T. de Bord</label>
+                                        <div class="col-sm-11">
+                                            <select class="form-control" name="_page" id="page_widget" required>
+                                                <option value="principal">T. Bord Principal</option>
+                                                <option value="interviews">Stat. Interviews</option>
+                                                <option value="concretisation">Concrétisation</option>
+                                                <option value="cles">Indic. clés</option>
+                                                <option value="qualite">Indic. De Qualité</option>
+                                                <option value="rapports">Rapports</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Type</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" name="_type" id="type_widget" required>
+                                                <option value="blocks" selected>Block</option>
+                                                <option value="tables">Plein</option>
+                                                <option value="socials">Social</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" name="_taille" id="taille_widget" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille mobile</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille_mobile" id="taille_mobile_widget" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Libellé</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Intitulé du widget" name="_libelle" id="libelle_widget" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Couleur</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="color_widget" class="form-control demo" data-control="hue" value="#120505" name="_color" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Icone</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Classe css de l'îcone" name="_icone" id="icone_widget" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Profils</label>
+                                        <div class="col-sm-5">
+                                            <select class="form-control" id="addFormPigorRoles" multiple="multiple"  name="_roles" required>
+                                                <option value="ROLE_SUPER_ADMIN">SUPERADMIN</option>
+                                                <option value="ROLE_GEOMATICIEN">GEOMATICIEN</option>
+                                                <option value="ROLE_MINISTRE">MINISTRE</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Requête SQL</label>
+                                        <div class="col-sm-11">
+                                            <textarea rows="2" cols="5" class="form-control" placeholder="Sql" name="_requeteSql" id="sql_widget" required></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <span class="text-danger col-sm-12"><b> ----- Le paramétre des filtres doit impérativement se nommer "filtre" -----</b></span>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n1</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 1er niveau" name="_requeteSql_n1" id="sql_n1_widget"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n2</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 2nd niveau" name="_requeteSql_n2" id="sql_n2_widget"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n3</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 3éme niveau" name="_requeteSql_n3" id="sql_n3_widget"></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-10 col-form-label"></label>
+                                        <div class="col-sm-2">
+                                            <button id="btn-add-widget" type="submit" class="btn btn-sm btn-info">Créer le widget</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <a class="accordion-msg bg-dark-primary b-none" tabindex="1"><i class="fa fa-bar-chart-o"></i> Diagrammes</a>
+                            <div class="accordion-desc">
+                                <form autocomplete="off" method="post" id="addDiagram">
+                                    <input type="hidden" id="id_diagram" name="_id" value="">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Page T. de Bord</label>
+                                        <div class="col-sm-11">
+                                            <select class="form-control" name="_page" id="page_diagram" required>
+                                                <option value="principal">T. Bord Principal</option>
+                                                <option value="interviews">Stat. Interviews</option>
+                                                <option value="concretisation">Concrétisation</option>
+                                                <option value="cles">Indic. clés</option>
+                                                <option value="qualite">Indic. De Qualité</option>
+                                                <option value="rapports">Rapports</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Type</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" name="_type" id="type_diagram" required>
+                                                <option value="horizontal diagram" selected>Horizontal diagram</option>
+                                                <option value="vertical diagram">Vertical diagram</option>
+                                                <option value="stacked diagram">Stacked diagram</option>
+                                                <option value="pyramide">Pyramide</option>
+                                                <option value="linear">Linéaire</option>
+                                                <option value="pie">Circulaire</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille" id="taille_diagram" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille mobile</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille_mobile" id="taille_mobile_diagram" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Libellé</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" placeholder="Intitulé du diagramme" name="_libelle" id="libelle_diagram" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label" id="color_label">Couleur</label>
+                                        <div id="color_div" class="col-sm-3">
+                                            <input type="text" id="color_diagram" class="form-control demo" data-control="hue" value="#120505" name="_color" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Profils</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="addFormPigorRoles_diagram" multiple="multiple"  name="_roles" required>
+                                                <option value="ROLE_SUPER_ADMIN">SUPERADMIN</option>
+                                                <option value="ROLE_GEOMATICIEN">GEOMATICIEN</option>
+                                                <option value="ROLE_MINISTRE">MINISTRE</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row" id="block-color-side" style="display: none;">
+                                        <label class="col-sm-1 col-form-label">Couleur gauche</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="color_left_diagram" class="form-control demo" data-control="hue" value="#120505" name="_color_left" required="">
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Couleur droite</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="color_right_diagram" class="form-control demo" data-control="hue" value="#120505" name="_color_right" required="">
+                                        </div>
+                                    </div><br>
+                                    <div class="row" id="block-datasets" style="display: none;">
+                                        <label class="col-sm-1 col-form-label">Datasets</label>
+                                        <div class="col-sm-11">
+                                            <input type="text" class="form-control" placeholder="Exemple: Collecte, Attendue" name="_datasets" id="datasets_diagram" required="">
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Requête SQL</label>
+                                        <div class="col-sm-11">
+                                            <textarea rows="2" cols="5" class="form-control" placeholder="Sql" name="_requeteSql" id="sql_diagram" required></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <span class="text-danger col-sm-12"><b> ----- Le paramétre des filtres doit impérativement se nommer "filtre" -----</b></span>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n1</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 1er niveau" name="_requeteSql_n1" id="sql_n1_diagram"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n2</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 2nd niveau" name="_requeteSql_n2" id="sql_n2_diagram"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n3</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 3éme niveau" name="_requeteSql_n3" id="sql_n3_diagram"></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-10 col-form-label"></label>
+                                        <div class="col-sm-2">
+                                            <button id="btn-add-diagram" type="submit" class="btn btn-sm btn-info">Créer le diagramme</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <a class="accordion-msg bg-darkest-primary b-none" tabindex="1"><i class="fa fa-map-marker"></i> Cartes</a>
+                            <div class="accordion-desc">
+                                <form autocomplete="off" method="post" id="addCarte" enctype="multipart/form-data">
+                                    <input type="hidden" id="id_carte" name="_id" value="">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Page T. de Bord</label>
+                                        <div class="col-sm-11">
+                                            <select class="form-control" name="_page" id="page_carte" required>
+                                                <option value="principal">T. Bord Principal</option>
+                                                <option value="interviews">Stat. Interviews</option>
+                                                <option value="concretisation">Concrétisation</option>
+                                                <option value="cles">Indic. clés</option>
+                                                <option value="qualite">Indic. De Qualité</option>
+                                                <option value="rapports">Rapports</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Type</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" value="carte" placeholder="Carte" id="type_carte" name="_type" readonly>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille" id="taille_carte" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille mobile</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille_mobile" id="taille_mobile_carte" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Libellé</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Intitulé de la carte" name="_libelle" id="libelle_carte" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Mesure</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Exemple: %, Kg ..." name="_unite" id="unite_carte" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Valeur min</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control" placeholder="valeur min" name="_valeur_min" id="valeur_min_carte" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Valeur max</label>
+                                        <div class="col-sm-5">
+                                            <input type="number" class="form-control" placeholder="valeur max" name="_valeur_max" id="valeur_max_carte" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Nom propriété</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Nom des éléments dans le fichier JSON de la carte" name="_join_by" id="join_by_carte">
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Valeur pour les NULL</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Exemple: 0%, 0 Kg ..." name="_for_null" id="for_null_carte" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Couleur min</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="color_min_carte" class="form-control demo" data-control="hue" value="#d6d5d5" name="_color_min" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Couleur max</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="color_max_carte" class="form-control demo" data-control="hue" value="#120505" name="_color_max" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Couleur hover</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" id="color_hover_carte" class="form-control demo" data-control="hue" value="#167a43" name="_color_hover" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label" style="display: none;">Carte(.json)</label>
+                                        <div class="col-sm-3" style="display: none;">
+                                            <input type="file" accept="applicaton/json" class="form-control" id="geoJson_carte" name="_geoJson" >
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Nom carte</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" placeholder="Exemple: regions.json" name="_nom_carte" id="nom_carte" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Profils</label>
+                                        <div class="col-sm-3">
+                                            <select class="form-control" id="addFormPigorRoles_carte" multiple="multiple"  name="_roles" required>
+                                                <option value="ROLE_SUPER_ADMIN">SUPERADMIN</option>
+                                                <option value="ROLE_GEOMATICIEN">GEOMATICIEN</option>
+                                                <option value="ROLE_MINISTRE">MINISTRE</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Requête SQL</label>
+                                        <div class="col-sm-11">
+                                            <textarea rows="2" cols="5" class="form-control" placeholder="Sql" name="_requeteSql" id="sql_carte" required></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <span class="text-danger col-sm-12"><b> ----- Le paramétre des filtres doit impérativement se nommer "filtre" -----</b></span>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n1</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 1er niveau" name="_requeteSql_n1" id="sql_n1_carte"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n2</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 2nd niveau" name="_requeteSql_n2" id="sql_n2_carte"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n3</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 3éme niveau" name="_requeteSql_n3" id="sql_n3_carte"></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-10 col-form-label"></label>
+                                        <div class="col-sm-2">
+                                            <button id="btn-add-carte" type="submit" class="btn btn-sm btn-info">Créer la carte</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <a class="accordion-msg bg-primary b-none" tabindex="1"><i class="fa fa-table"></i> Tableaux</a>
+                            <div class="accordion-desc">
+                                <form autocomplete="off" method="post" id="addTableau">
+                                    <input type="hidden" id="id_tableau" name="_id" value="">
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Page T. de Bord</label>
+                                        <div class="col-sm-11">
+                                            <select class="form-control" name="_page" id="page_tableau" required>
+                                                <option value="principal">T. Bord Principal</option>
+                                                <option value="interviews">Stat. Interviews</option>
+                                                <option value="concretisation">Concrétisation</option>
+                                                <option value="cles">Indic. clés</option>
+                                                <option value="qualite">Indic. De Qualité</option>
+                                                <option value="rapports">Rapports</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Type</label>
+                                        <div class="col-sm-3">
+                                            <input type="text" class="form-control" value="tableau" placeholder="Tableau" id="type_tableau" name="_type" readonly>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille" id="taille_tableau" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Taille mobile</label>
+                                        <div class="col-sm-3">
+                                            <select name="select" class="form-control" name="_taille_mobile" id="taille_mobile_tableau" required>
+                                                <option value="12">12</option>
+                                                <option value="6">6</option>
+                                                <option value="4">4</option>
+                                                <option value="3">3</option>
+                                                <option value="2">2</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Libellé</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Titre du tableau" name="_libelle" id="libelle_tableau" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Couleur Header</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" id="color_header_tableau" class="form-control demo" data-control="hue" value="#120505" name="_color_header" required>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Liste des colonnes</label>
+                                        <div class="col-sm-5">
+                                            <input type="text" class="form-control" placeholder="Exemple: Nom, Prénom, Login" name="_col" id="col_tableau" required>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Profils</label>
+                                        <div class="col-sm-5">
+                                            <select class="form-control" id="addFormPigorRoles_tableau" placeholder="Les colonnes de sortie de la requête doivent correspondre à la liste des colonnes renseignée plus haut" multiple="multiple"  name="_roles" required>
+                                                <option value="ROLE_SUPER_ADMIN">SUPERADMIN</option>
+                                                <option value="ROLE_GEOMATICIEN">GEOMATICIEN</option>
+                                                <option value="ROLE_MINISTRE">MINISTRE</option>
+                                            </select>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-1 col-form-label">Requête SQL</label>
+                                        <div class="col-sm-11">
+                                            <textarea rows="2" cols="5" class="form-control" placeholder="Sql" name="_requeteSql" id="sql_tableau" required></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <span class="text-danger col-sm-12"><b> ----- Le paramétre des filtres doit impérativement se nommer "filtre" -----</b></span>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n1</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 1er niveau" name="_requeteSql_n1" id="sql_n1_tableau"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n2</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 2nd niveau" name="_requeteSql_n2" id="sql_n2_tableau"></textarea>
+                                        </div>
+                                        <label class="col-sm-1 col-form-label">Requête Filtres n3</label>
+                                        <div class="col-sm-3">
+                                            <textarea rows="5" cols="5" class="form-control" placeholder="Requête SQL des filtres du 3éme niveau" name="_requeteSql_n3" id="sql_n3_tableau"></textarea>
+                                        </div>
+                                    </div><br>
+                                    <div class="row">
+                                        <label class="col-sm-10 col-form-label"></label>
+                                        <div class="col-sm-2">
+                                            <button id="btn-add-tableau" type="submit" class="btn btn-sm btn-info">Créer le tableau</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-block">
+                        <div class="table-responsive dt-responsive">
+                            <fieldset class="border p-2">
+                                <legend>
+                                    <h6>
+                                        <p>
+                                            <strong>ELEMENTS DU DASHBOARD</strong> &nbsp;
+                                        </p>
+                                    </h6>
+                                </legend>
+                                <table id="dt_elmt_dash" class="table table-striped table-bordered nowrap" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">TYPE</th>
+                                            <th scope="col">LIBELLE</th>
+                                            <th scope="col">PAGE</th>
+                                            <th scope="col">STATUT</th>
+                                            <th scope="col">CREE PAR</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col">TYPE</th>
+                                            <th scope="col">LIBELLE</th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    <script>
+
+        $(document).ready(function(){
+
+            // Color picker js start
+            function change_checkbox_color() {
+                $('.color-box .show-box').on('click', function() {
+                    $(".color-box").toggleClass("open");
+                });
+
+                $('.colors-list a').on('click', function() {
+                    var curr_color = $('main').data('checkbox-color');
+                    var color = $(this).data('checkbox-color');
+                    var new_colot = 'checkbox-' + color;
+
+                    $('.rkmd-checkbox .input-checkbox').each(function(i, v) {
+                        var findColor = $(this).hasClass(curr_color);
+
+                        if (findColor) {
+                            $(this).removeClass(curr_color);
+                            $(this).addClass(new_colot);
+                        }
+
+                        $('main').data('checkbox-color', new_colot);
+
+                    });
+                });
+            }
+
+            // Mini-color js start
+            $('.demo').each(function() {
+                $(this).minicolors({
+                    control: $(this).attr('data-control') || 'hue',
+                    defaultValue: $(this).attr('data-defaultValue') || '',
+                    format: $(this).attr('data-format') || 'hex',
+                    keywords: $(this).attr('data-keywords') || '',
+                    inline: $(this).attr('data-inline') === 'true',
+                    letterCase: $(this).attr('data-letterCase') || 'lowercase',
+                    opacity: $(this).attr('data-opacity'),
+                    position: $(this).attr('data-position') || 'bottom left',
+                    swatches: $(this).attr('data-swatches') ? $(this).attr('data-swatches').split('|') : [],
+                    change: function(value, opacity) {
+                        if (!value) return;
+                        if (opacity) value += ', ' + opacity;
+                        if (typeof console === 'object') {
+                            console.log(value);
+                        }
+                    },
+                    theme: 'bootstrap'
+                });
+
+            });
+            // Mini-color js ends
+
+            $('#addFormPigorRoles').select2({
+                
+            });
+            $('#addFormPigorRoles_carte').select2({
+                
+            });
+            $('#addFormPigorRoles_diagram').select2({
+                
+            });
+            $('#addFormPigorRoles_tableau').select2({
+                
+            });
+
+            //Activation du champ datasets
+            $('#type_diagram').change(function(){
+                let choice = $(this).val();
+                // console.log('Diagram Choice', choice);
+                if(choice == 'stacked diagram' || choice == 'pyramide'){
+                    $('#block-datasets').show();
+                    $('#datasets_diagram').attr('required', true);
+                }else{
+                    $('#datasets_diagram').removeAttr('required');
+                    $('#datasets_diagram').val('');
+                    $('#block-datasets').hide();
+                }
+
+                if(choice == 'pyramide'){
+                    $('#block-color-side').show();
+                    $('#color_left_diagram').attr('required', true);
+                    $('#color_right_diagram').attr('required', true);
+
+                    $('#color_diagram').removeAttr('required');
+                    $('#color_label').hide();
+                    $('#color_div').hide();
+
+                }else{
+                    $('#color_left_diagram').removeAttr('required');
+                    $('#color_right_diagram').removeAttr('required');
+                    $('#color_left_diagram').val('');
+                    $('#color_right_diagram').val('');
+                    $('#block-color-side').hide();
+
+                    $('#color_label').show();
+                    $('#color_div').show();
+                    $('#color_diagram').attr('required', true);
+                }
+
+                if(choice == 'pie'){
+                    $('#color_diagram').removeAttr('required');
+                    $('#color_label').hide();
+                    $('#color_div').hide();
+
+                }else if(choice != 'pyramide') {
+                    $('#color_label').show();
+                    $('#color_div').show();
+                    $('#color_diagram').attr('required', true);
+                }
+
+            });
+
+
+            // Permet d'ajouter un élément au tableau de bord
+            $('#addWidget').submit(function (e) {
+
+                $("#btn-add-widget").removeAttr("disabled");
+
+                //prevent default
+                e.preventDefault();
+                //do something here
+                $("#btn-add-widget").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('addWidgetsInDashboard') }}",
+                    data: {
+                        '_id': $("#id_widget").val(),
+                        '_page': $("#page_widget").val(),
+                        '_type': $("#type_widget").val(),
+                        '_taille': $("#taille_widget").val(),
+                        '_taille_mobile': $("#taille_mobile_widget").val(),
+                        '_libelle': $("#libelle_widget").val(),
+                        '_color': $("#color_widget").val(),
+                        '_icone': $("#icone_widget").val(),
+                        '_roles': $("#addFormPigorRoles").val(),
+                        '_requeteSql': $("#sql_widget").val(),
+                        '_requeteSql_n1': $("#sql_n1_widget").val(),
+                        '_requeteSql_n2': $("#sql_n2_widget").val(),
+                        '_requeteSql_n3': $("#sql_n3_widget").val(),
+                    },
+                    beforeSend: function () {
+                        $('.censusmp-loader').show();
+                    },
+                    success: function (response) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Ajout indicateur !',
+                            response,
+                            'success'
+                        );
+                        $("#btn-add-widget").removeAttr("disabled");
+                        elmtsDt.ajax.reload();     
+                        location.reload();
+                    },
+                    error: function (status, text) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Attention !',
+                            status.responseJSON,
+                            'error'
+                        );
+                        $("#btn-add-widget").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+          
+
+            // Permet d'ajouter une carte au tableau de bord
+            $('#addCarte').submit(function (e) {
+                $("#btn-add-carte").removeAttr("disabled");
+
+                //prevent default
+                e.preventDefault();
+                //do something here
+                $("#btn-add-carte").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('addWidgetsInDashboard') }}",
+                    data: {
+                        '_id': $("#id_carte").val(),
+                        '_page': $("#page_carte").val(),
+                        '_type': $("#type_carte").val(),
+                        '_taille': $("#taille_carte").val(),
+                        '_taille_mobile': $("#taille_mobile_carte").val(),
+                        '_libelle': $("#libelle_carte").val(),
+                        '_unite': $("#unite_carte").val(),
+                        '_valeur_min': $("#valeur_min_carte").val(),
+                        '_valeur_max': $("#valeur_max_carte").val(),
+                        '_join_by': $("#join_by_carte").val(),
+                        '_for_null': $("#for_null_carte").val(),
+                        '_color_min':$("#color_min_carte").val(),
+                        '_color_max': $("#color_max_carte").val(),
+                        '_color_hover': $("#color_hover_carte").val(),
+                        '_geoJson': $("#geoJson_carte").val(),
+                        '_nom_carte': $("#nom_carte").val(),
+                        '_roles': $("#addFormPigorRoles_carte").val(),
+                        '_requeteSql': $("#sql_carte").val(),
+                        '_requeteSql_n1': $("#sql_n1_carte").val(),
+                        '_requeteSql_n2': $("#sql_n2_carte").val(),
+                        '_requeteSql_n3': $("#sql_n3_carte").val(),
+                    },
+                    beforeSend: function () {
+                        $('.censusmp-loader').show();
+                    },
+                    success: function (response) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Ajout indicateur !',
+                            response,
+                            'success'
+                        );
+                        $("#btn-add-carte").removeAttr("disabled");
+                        elmtsDt.ajax.reload();
+                        location.reload();
+                    },
+                    error: function (status, text) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Attention !',
+                            status.responseJSON,
+                            'error'
+                        );
+                        $("#btn-add-carte").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+
+            // Permet d'ajouter un diagramme au tableau de bord
+            $('#addDiagram').submit(function (e) {
+
+                $("#btn-add-diagram").removeAttr("disabled");
+
+                //prevent default
+                e.preventDefault();
+                //do something here
+                $("#btn-add-diagram").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('addWidgetsInDashboard') }}",
+                    data: {
+                        '_id': $("#id_diagram").val(),
+                        '_page': $("#page_diagram").val(),
+                        '_type': $("#type_diagram").val(),
+                        '_taille': $("#taille_diagram").val(),
+                        '_taille_mobile': $("#taille_mobile_diagram").val(),
+                        '_libelle': $("#libelle_diagram").val(),
+                        '_color': $("#color_diagram").val(),
+                        '_roles': $("#addFormPigorRoles_diagram").val(),
+                        '_requeteSql': $("#sql_diagram").val(),
+                        '_datasets' : $("#datasets_diagram").val(),
+                        '_requeteSql_n1': $("#sql_n1_diagram").val(),
+                        '_requeteSql_n2': $("#sql_n2_diagram").val(),
+                        '_requeteSql_n3': $("#sql_n3_diagram").val(),
+                        '_color_left': $("#color_left_diagram").val(),
+                        '_color_right': $("#color_right_diagram").val(),
+                    },
+                    beforeSend: function () {
+                        $('.censusmp-loader').show();
+                    },
+                    success: function (response) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Ajout indicateur !',
+                            response,
+                            'success'
+                        );
+                        $("#btn-add-diagram").removeAttr("disabled");
+                        elmtsDt.ajax.reload();   
+                        location.reload();
+                    },
+                    error: function (status, text) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Attention !',
+                            status.responseJSON,
+                            'error'
+                        );
+                        $("#btn-add-diagram").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+          
+            // Permet d'ajouter un tableau au tableau de bord
+            $('#addTableau').submit(function (e) {
+
+                $("#btn-add-tableau").removeAttr("disabled");
+
+                //prevent default
+                e.preventDefault();
+                //do something here
+                $("#btn-add-tableau").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('addWidgetsInDashboard') }}",
+                    data: {
+                        '_id': $("#id_tableau").val(),
+                        '_page': $("#page_tableau").val(),
+                        '_type': $("#type_tableau").val(),
+                        '_taille': $("#taille_tableau").val(),
+                        '_taille_mobile': $("#taille_mobile_tableau").val(),
+                        '_libelle': $("#libelle_tableau").val(),
+                        '_col': $("#col_tableau").val(),
+                        '_color': $("#color_header_tableau").val(),
+                        '_roles': $("#addFormPigorRoles_tableau").val(),
+                        '_requeteSql': $("#sql_tableau").val(),
+                        '_requeteSql_n1': $("#sql_n1_tableau").val(),
+                        '_requeteSql_n2': $("#sql_n2_tableau").val(),
+                        '_requeteSql_n3': $("#sql_n3_tableau").val(),
+                    },
+                    beforeSend: function () {
+                        $('.censusmp-loader').show();
+                    },
+                    success: function (response) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Ajout indicateur !',
+                            response,
+                            'success'
+                        );
+                        $("#btn-add-tableau").removeAttr("disabled");
+                        elmtsDt.ajax.reload();
+                        location.reload();
+                    },
+                    error: function (status, text) {
+                        $('.censusmp-loader').hide();
+                        Swal.fire(
+                            'Attention !',
+                            status.responseJSON,
+                            'error'
+                        );
+                        $("#btn-add-tableau").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+
+
+            $('#dt_elmt_dash thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if(title == 'LIBELLE' || title == 'TYPE'){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+
+            elmtsDt = $('#dt_elmt_dash').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },
+                "ajax": "{{ path('config_dashboard') }}",
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20,10, 25, 50, 100],
+                "order": [[ 0, "desc" ]],
+                "columns": [
+                        { "data": "id", "visible": false },
+                        { "data": "type" },
+                        { "data": "libelle" },
+                        { "data": "page" },
+                        { "data": "statut", sortable: false, render: function(data, type, row){
+                         return data == 'Actif' ? `<label class="badge badge-sm bg-success">Actif</label>`: `<label class="badge badge-sm bg-danger">Desactivé</label>`;
+                    },
+                },
+
+                        { "data": "utilisateur" },
+                        {sortable: false, "render": (data, type, row, meta) => {
+                            if (row.statut == "Actif") {
+                                btn_stat = ` <button class="change-stat btn-warning" data-id="${row.id}" title="Desactiver"
+                                                > <i class="ti-close"></i>
+                                            </button>`
+                            }else{
+                                btn_stat = ` <button class="change-stat btn-success" data-id="${row.id}" title="Activer"
+                                                > <i class="ti-check"></i>
+                                            </button>`
+                            }
+                            return `<button class="edit-button-class btn-inverse" 
+                                        data-id="${row.id}" title="Modifier"
+                                    > <i class="ti-pencil"></i>
+                                </button> &nbsp;
+
+                                ${btn_stat} &nbsp;
+
+                                <button class="to-remove btn-danger" 
+                                        data-id="${row.id}" title="Supprimer"
+                                    > <i class="ti-trash"></i>
+                                </button>
+                            `;
+                        }},
+                    ],
+
+                    initComplete: function () {
+                        // Apply the search
+                        this.api().columns().every( function () {
+                            var that = this;
+            
+                            $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                                
+                                if (e.keyCode == 13 && that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+
+                            $('select', this.header() ).on( 'change', function (e) {
+                                    
+                                if (that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+                        });
+                    },
+            });
+
+
+
+            // $('.to-remove').click(function(){
+            $(document).on ("click", ".to-remove", function (){
+                var id =  $(this).data('id');
+                var url_del = Routing.generate('indicator_delete',{'id': id});
+                var removeAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            type: "GET",
+                            url: url_del,
+                            beforeSend: function(){
+                               $('.censusmp-loader').show();
+                            },
+                            success: function (response) {
+                                $('.censusmp-loader').hide();
+                                Swal.fire(
+                                    'Suppression !',
+                                    response,
+                                    'success'
+                                );
+                                elmtsDt.ajax.reload(); 
+
+                            }, error (status, text) {
+                                $('.censusmp-loader').hide();   
+                                    Swal.fire(
+                                    'Attention !',
+                                    status.responseJSON,
+                                    'error'
+                                );
+                            }
+                        })
+                    });
+                };
+                confirmationToExecutePromise('Etes-vous sûr de vouloir supprimer cet indicateur ?','Suppression Concessions', "Suppression Réussie", removeAction).then(function(){
+                    elmtsDt.ajax.reload(); 
+                });
+            });
+
+
+            $(document).on ("click", ".change-stat", function (){
+                var id =  $(this).data('id');
+                var url_change = Routing.generate('indicator_status_change',{'id': id});
+                var removeAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            type: "GET",
+                            url: url_change,
+                            beforeSend: function(){
+                               $('.censusmp-loader').show();
+                            },
+                            success: function (response) {
+                                $('.censusmp-loader').hide();
+                                Swal.fire(
+                                    'Statut !',
+                                    response,
+                                    'success'
+                                );
+                                elmtsDt.ajax.reload(); 
+
+                            }, error (status, text) {
+                                $('.censusmp-loader').hide();   
+                                    Swal.fire(
+                                    'Attention !',
+                                    status.responseJSON,
+                                    'error'
+                                );
+                            }
+                        })
+                    });
+                };
+                confirmationToExecutePromise('Changement de statut ?','Indicateur', "Réussie", removeAction).then(function(){
+                    elmtsDt.ajax.reload(); 
+                });
+            });
+
+
+            $(document).on ("click", ".edit-button-class", function (){
+                var id =  $(this).data('id');
+                var url = Routing.generate('get_indicator_items',{'id': id});
+
+                        $.ajax({
+                            type: "GET",
+                            url: url,
+                            beforeSend: function(){
+                               $('.censusmp-loader').show();
+                            },
+                            success: function (response) {
+                                $('.censusmp-loader').hide();
+                                if(response.type == 'blocks' || response.type == 'tables' || response.type == 'socials'){
+                                    $('a.accordion-msg:contains(" Widgets")').trigger( "click" );
+                                    setTimeout(function() {
+                                        $('a.accordion-msg:contains(" Widgets")').focus();
+                                    }, 200);
+                                    // $('html, body').animate({ scrollTop: $('a.accordion-msg:contains(" Widgets")').offset().top }, 'slow');
+                                    $("#id_widget").val(response.id);
+                                    $("#page_widget").val(response.dashboard);
+                                    $("#type_widget").val(response.type);
+                                    $("#taille_widget").val(response.taille);
+                                    $("#taille_mobile_widget").val(response.taille_mobile);
+                                    $("#libelle_widget").val(response.libelle);
+                                    $("#color_widget").val(response.couleur);
+                                    $("#icone_widget").val(response.icone);
+                                    $("#addFormPigorRoles").val(response.profils).trigger('change');
+                                    $("#sql_widget").val(response.sql);
+                                    $("#sql_n1_widget").val(response.sql1);
+                                    $("#sql_n2_widget").val(response.sql2);
+                                    $("#sql_n3_widget").val(response.sql3);
+
+                                }else if(response.type == 'horizontal diagram' || response.type == 'vertical diagram' || response.type == 'stacked diagram'
+                                        || response.type == 'pyramide' || response.type == 'linear' || response.type == 'pie'){
+                                    $('a.accordion-msg:contains(" Diagrammes")').trigger( "click" );
+                                    setTimeout(function() {
+                                        $('a.accordion-msg:contains(" Diagrammes")').focus();
+                                    }, 200);
+                                    // $('html, body').animate({ scrollTop: $('a.accordion-msg:contains(" Diagrammes")').offset().top }, 'slow');
+                                    $("#id_diagram").val(response.id);
+                                    $("#page_diagram").val(response.dashboard);
+                                    $("#type_diagram").val(response.type);
+                                    $("#taille_diagram").val(response.taille);
+                                    $("#taille_mobile_diagram").val(response.taille_mobile);
+                                    $("#libelle_diagram").val(response.libelle);
+                                    $("#addFormPigorRoles_diagram").val(response.profils).trigger('change');
+                                    $("#sql_diagram").val(response.sql);
+                                    $("#sql_n1_diagram").val(response.sql1);
+                                    $("#sql_n2_diagram").val(response.sql2);
+                                    $("#sql_n3_diagram").val(response.sql3);
+
+                                    if(response.type == 'horizontal diagram' || response.type == 'vertical diagram' || response.type == 'linear'){
+                                        $("#color_diagram").val(response.couleur);
+                                    }else if(response.type == 'stacked diagram'){
+                                        $("#color_diagram").val(response.couleur);
+                                        $("#datasets_diagram").val(response.datasets);
+                                    }else if(response.type == 'pyramide'){
+                                        $("#color_left_diagram").val(response.couleur_gauche);
+                                        $("#color_right_diagram").val(response.couleur_droite);
+                                        $("#datasets_diagram").val(response.datasets);
+                                    }
+                                }else if(response.type == 'carte'){
+                                    $('a.accordion-msg:contains(" Cartes")').trigger( "click" );
+                                    setTimeout(function() {
+                                        $('a.accordion-msg:contains(" Cartes")').focus();
+                                    }, 200);
+                                    // $('html, body').animate({ scrollTop: $('a.accordion-msg:contains(" Cartes")').offset().top }, 'slow');
+                                    $("#id_carte").val(response.id);
+                                    $("#page_carte").val(response.dashboard);
+                                    $("#type_carte").val(response.type);
+                                    $("#taille_carte").val(response.taille);
+                                    $("#taille_mobile_carte").val(response.taille_mobile);
+                                    $("#libelle_carte").val(response.libelle);
+                                    $("#unite_carte").val(response.unite_mesure);
+                                    $("#valeur_min_carte").val(response.min);
+                                    $("#valeur_max_carte").val(response.max);
+                                    $("#join_by_carte").val(response.join_by);
+                                    $("#for_null_carte").val(response.for_null);
+                                    $("#color_min_carte").val(response.color_min);
+                                    $("#color_max_carte").val(response.color_max);
+                                    $("#color_hover_carte").val(response.color_hover);
+                                    $("#nom_carte").val(response.nom_carte);
+                                    $("#addFormPigorRoles_carte").val(response.profils).trigger('change');
+                                    $("#sql_carte").val(response.sql);
+                                    $("#sql_n1_carte").val(response.sql1);
+                                    $("#sql_n2_carte").val(response.sql2);
+                                    $("#sql_n3_carte").val(response.sql3);
+
+                                }else if(response.type == 'tableau'){
+                                    $('a.accordion-msg:contains(" Tableaux")').trigger( "click" );
+                                    setTimeout(function() {
+                                        $('a.accordion-msg:contains(" Tableaux")').focus();
+                                    }, 200);
+                                    // $('html, body').animate({ scrollTop: $('a.accordion-msg:contains(" Tableaux")').offset().top }, 'slow');
+                                    $("#id_tableau").val(response.id);
+                                    $("#page_tableau").val(response.dashboard);
+                                    $("#type_tableau").val(response.type);
+                                    $("#taille_tableau").val(response.taille);
+                                    $("#taille_mobile_tableau").val(response.taille_mobile);
+                                    $("#libelle_tableau").val(response.libelle);
+                                    $("#color_header_tableau").val(response.couleur);
+                                    $("#col_tableau").val(response.colonnes);
+                                    $("#addFormPigorRoles_tableau").val(response.profils).trigger('change');
+                                    $("#sql_tableau").val(response.sql);
+                                    $("#sql_n1_tableau").val(response.sql1);
+                                    $("#sql_n2_tableau").val(response.sql2);
+                                    $("#sql_n3_tableau").val(response.sql3);
+                                }
+
+                                // console.log('RES', response);
+
+                            }, error (status, text) {
+                                $('.censusmp-loader').hide();   
+                                    Swal.fire(
+                                    'Attention !',
+                                    status.responseJSON,
+                                    'error'
+                                );
+                            }
+                        })
+                  
+            });
+
+        })
+    </script>
+{% endblock %}

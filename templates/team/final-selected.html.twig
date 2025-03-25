@@ -1,0 +1,137 @@
+{% extends "base.html.twig" %}
+
+{% block title %} Création des équipes {% endblock %}
+
+{% block body %}
+
+<div class="page-wrapper">                                    
+    <div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            {# Msg notifiy #}
+                            <div class="col-md-12">  
+                                <div class="text-center">
+                                    {% for label, messages in app.flashes %}
+                                        <button class="alert bg-{{ label }} btn-sm" style="height: auto; ">
+                                            {% for message in messages %}
+                                                <p>{{ message | raw }}</p>
+                                            {% endfor %}
+                                        </button>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {# Création équipe #}
+                            <div class="col-lg-12">
+                                <fieldset class="border p-2">
+                                    <legend>
+                                        <p class="font-weight-light font-italic" style="font-weight: 4.5rem;">
+                                            Cette page permet de valider la sélection des agents après la formation. <br/>Seul les fichiers d'extension Excel (.xls ou .xlsx) sont autorisés.
+                                        </p>
+                                    </legend>
+                                    <form method="post" action="" enctype="multipart/form-data" id="formFiles">
+                                        <div class="form-group mb-2 row">
+                                            <div class="col-8">
+                                                <input type="file" class="form-control" id="upload" name="_file" class="form-control" required>
+                                            </div>
+                                            <div class="col  pt-2">
+                                                <label for="template" class=""></label>
+                                               <a  href="javascript:void(0);" 
+                                                    class="btn-primary btn-sm" 
+                                                    id="clearBtn">
+                                                    Vider le champ
+                                                </a>  
+                                            </div>
+                                        </div>
+                                    </form>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+
+    <script>
+        
+                
+        $(document).ready(function(){
+
+            $('#upload').change(function(){
+
+                // récupère le fichier
+                var file_data = $('#upload').prop('files')[0];   
+                var form_data = new FormData();                  
+                form_data.append('file', file_data);
+
+                var isnotxls = isExcelFile(file_data);
+                if(isnotxls){
+                    Swal.fire(
+                        'Alerte',
+                        `Ce n'est pas un fichier Excel`,
+                        'info'
+                    );
+                    return;
+                }
+
+                jQuery.ajax({
+                    url: "{{ path('app_profilage_upload') }}",
+                    data: form_data,
+                    beforeSend: function(){
+                        $('.censusmp-loader').show();
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    method: 'POST',
+                    type: 'POST',
+                    success: function(response){
+                        $('.censusmp-loader').hide();   
+                        let redirectUrl = Routing.generate('app_users_superviseurs');
+                        document.location.href = `${redirectUrl}`;
+                        //console.log(response);
+                    }, error (status, text) {
+                        console.error(status)
+                        $('.censusmp-loader').hide();   
+                        
+                        Swal.fire(
+                            'Attention !',
+                             status.responseJSON,
+                            'error'
+                        );
+                    }
+                });
+            });
+
+            function isExcelFile(file) {
+
+                var originalFileName = file['name'];
+
+                var ext = originalFileName.split(".");
+                ext = ext[ext.length-1].toLowerCase();      
+                var arrayExtensions = ["xls", "xlsx"];
+
+                if (arrayExtensions.lastIndexOf(ext) == -1) {
+                    return true;
+                }
+                return false;
+            }
+
+            $("#clearBtn").click(function(){
+               $("#upload").replaceWith($("#upload").val('').clone(true));
+            });
+           
+
+        });
+    </script>
+{% endblock %}
+

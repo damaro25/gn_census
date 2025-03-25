@@ -1,0 +1,1341 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+        TABLEAU DE BORD DE SUIVI DES OPERATIONS DE TERRAIN <span id="KEYDEP" style="display: none;">national</span>
+    {% elseif is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+        TABLEAU DE BORD DE SUIVI DES OPERATIONS DE TERRAIN | <strong>{{ connectedUser.departement.region.nom }}</strong><span id="KEYDEP" style="display: none;">{{ connectedUser.departement.region.code }}</span>
+    {% elseif is_granted('ROLE_CTD') %}
+        TABLEAU DE BORD DE SUIVI DES OPERATIONS DE TERRAIN | <strong>{{ connectedUser.departement.nom }}</strong><span id="KEYDEP" style="display: none;">{{ connectedUser.departement.code }}</span>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheet %}
+ {{ parent() }}
+
+<style>
+.card {
+    margin-bottom: 7px;
+}
+
+.card .card-header {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+</style>
+
+{% endblock stylesheet %}
+
+{% block body %}
+
+<div class="page-wrapper">
+	<div class="page-body">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-right">
+                    <div class="m-t-15 mr-3">
+                        <a href="#" type="button" class="btn btn-outline-info btn-mini waves-effect" style="font-size: 12px;">
+                            T. bord principal
+                        </a>
+                        <a href="#" type="button" class="btn btn-facebook btn-mini waves-effect" style="font-size: 12px;">
+                            Stat. interviews
+                        </a>
+                        <a href="#" type="button" class="btn btn-twitter btn-mini waves-effect" style="font-size: 12px;">
+                            Concrétisation
+                        </a>
+                        <a href="#" type="button" class="btn btn-secondary btn-mini waves-effect" style="font-size: 12px;">
+                            Indic. clés
+                        </a>
+                        <a href="#" type="button" class="btn btn-primary btn-mini waves-effect" style="font-size: 12px;">
+                            Indic. de qualité
+                        </a> 
+                        <a href="#" type="button" class="btn btn-warning btn-mini waves-effect" style="font-size: 12px;">
+                            Rapports
+                        </a>
+                    </div>
+                </div>
+                <h5>Filtres géographiques</h5>
+                <span>Appliquez des filtres du niveau {% if is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %} <code>régional</code> {% elseif is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %} <code>national</code> {% else %} <code>départemental</code>  {% endif %} au niveau <code>district de recensement</code></span>
+            </div>
+            <div class="card-block" style="padding-bottom: 0.5rem; padding-top: 0.25rem;">
+                <div class="row">
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="region" name="select" class="form-control form-control-primary">
+                            <option value="all">CHOISIR UNE REGION</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="dept" name="select" class="form-control form-control-info">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    {% elseif is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="dept" name="select" class="form-control form-control-info">
+                            <option value="{{ connectedUser.departement.region.code }}">CHOISIR UNE PREFECTURE</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') or is_granted('ROLE_SRSD') 
+                        or is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="comm" name="select" class="form-control form-control-success">
+                            <option value="opt1"></option>
+                        </select>
+                    </div>
+                    {% elseif is_granted('ROLE_CTD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="comm" name="select" class="form-control form-control-success">
+                            <option value="{{connectedUser.departement.code}}">CHOISIR UNE COMMUNE</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {# <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="filtre_dr" name="select" class="form-control form-control-inverse">
+                            <option value="opt1"></option>
+                        </select>
+                    </div> #}
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6 col-xl-2" style="padding-right: 3px">
+                <div class="card client-blocks dark-primary-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Pop denomb</h5>
+                        <ul>
+                            <li>
+                                <i class="icofont icofont-ui-user-group"></i>
+                            </li>
+                            <li id="pop_carto" class="text-right">
+                                116 270
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-2" style="padding-right: 3px; padding-left: 3px">
+                <div class="card client-blocks dark-primary-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Men. denomb</h5>
+                        <ul>
+                            <li>
+                                <i class="icofont icofont-ui-user-group"></i>
+                            </li>
+                            <li id="pop_attendu" class="text-right">
+                                18 662
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-2" style="padding-right: 3px; padding-left: 3px">
+                <div class="card client-blocks dark-primary-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Conc. denomb</h5>
+                        <ul>
+                            <li>
+                                <i class="icofont icofont-home"></i>
+                            </li>
+                            <li id="pop_collecte" class="text-right">
+                                9727
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-2" style="padding-right: 3px; padding-left: 3px">
+                <div id="id-couv-client-blocks" class="card client-blocks success-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Ilots denomb </h5>
+                        <ul>
+                            <li>
+                                <i id="id-couv-icofont-color" class="icofont icofont-map-pins text-success"></i>
+                            </li>
+                            <li id="id-couv-value-card" class="text-right text-success">
+                               <span id="pop_couverture">
+                                441
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-2" style="padding-right: 3px; padding-left: 3px">
+                <div id="id-client-blocks" class="card client-blocks success-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Secteurs denomb </h5>
+                        <ul>
+                            <li>
+                                <i id="id-icofont-color" class="icofont icofont-map-search text-success"></i>
+                            </li>
+                            <li id="id-value-card" class="text-right text-success">
+                               <span id="pop_progression">
+                                190
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-xl-2" style="padding-left: 3px">
+                <div class="card client-blocks info-border">
+                    <div class="card-block" style="padding-top: 0.5rem; padding-bottom: 0.5rem">
+                        <h5>Loc denomb</h5>
+                        <ul>
+                            <li>
+                                <i class="icofont icofont-social-google-map text-info"></i>
+                            </li>
+                            <li id="nb_jour_col" class="text-right text-info">
+                                103
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- Google-plus card end -->
+            <!-- NVD3 chart start -->
+            <div class="col-md-12 col-xl-6" style="padding-right: 3px">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>TAUX DE COUVERTURE PAR REGION</h6>
+                    </div>
+                    <div class="card-block" style="padding: 0rem;">
+                        <div id="reg_taux" style="display: block; height: 542px; width: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- NVD3 chart end -->
+            <div class="col-md-12 col-xl-6" style="padding-left: 3px">
+                <div class="card">
+                    <div class="card-header">
+                        <h6>TAUX DE COUVERTURE PAR PREFECTURE</h6>
+                    </div>
+                    <div class="card-block" style="padding: 0rem;">
+                        <div id="couverture_carte" style="display: block; height: 542px; width: auto;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <span>PROGRESSION PAR REGION</span>
+                    </div>
+                    <div id="rapport_block_progression" class="card-block">
+                        <canvas id="rapport_progression" style="display: block; height: 410px; width: 100%;"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="">SUIVI DES REMONTEES DES AGENTS</h6>
+                    </div>
+                    <div class="card-block table-border-style">
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th class="text-center">Superviseur</th>
+                                    <th class="text-center">agent</th>
+                                    <th class="text-center">Date dernière remontée</th>
+                                    <th class="text-center">Nb jour</th>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">187654 | Abou BA</td>
+                                    <td class="text-center">187001 | Abdoulaye Moussa</td>
+                                    <td class="text-center">27/11/2023</td>
+                                    <td class="text-center">4</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-center">187654 | Abou BA</td>
+                                    <td class="text-center">187001 | Aïssatou SY </td>
+                                    <td class="text-center">30/11/2023</td>
+                                    <td class="text-center">1</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>    
+                </div>
+            </div>
+
+            <!-- Table end -->
+            <!-- Date-based chart start -->
+            {# <div class="col-xl-8 col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Daily Page Visit</h5>
+                        <span>Lorem ipsum dolor sit amet, consectetur adipisicing elit</span>
+                    </div>
+                    <div class="card-block">
+                        <div id="datebasechart"></div>
+                    </div>
+                </div>
+            </div> #}
+            <!-- Date-based chart end -->
+
+            <!-- User activities chart start -->
+            {# <div class="col-md-12 col-xl-4">
+                <div class="card user-activity-card">
+                    <div class="card-block-big">
+                        <h5>Page Visits</h5>
+                        <h3 class="user-number">195</h3>
+                        <h6 class="m-b-15">Social Users</h6>
+                        <div class="progress m-b-30">
+                            <div class="progress-bar progress-bar-striped progress-sm progress-bar-warning" role="progressbar" style="width: 50%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <p>Page Visits</p>
+                                <h6>1265</h6>
+                            </div>
+                            <div class="col-sm-6">
+                                <p>New Visitors</p>
+                                <h6>67%</h6>
+                            </div>
+                        </div>
+                        <i class="icofont icofont-link-alt link"></i>
+                    </div>
+                    <div class="card-footer">
+                        <p class="m-b-0">This is standard panel footer</p>
+                    </div>
+                </div>
+            </div> #}
+            <!-- User activities chart end -->
+
+
+            <!-- Live-chart start -->
+            {# <div class="col-xl-5 dashbored-live-left col-lg-6">
+                <div class="card widget">
+                    <div class="section section-graph">
+                        <div class="graph-info">
+                            <i class="graph-arrow"></i>
+                            <span class="graph-info-big">634.39</span>
+                            <span class="graph-info-small">+2.18 (3.71%)</span>
+                        </div>
+                        <div id="graph"></div>
+                    </div>
+                    <div class="section section-info">
+                        <span class="info-time">Today 2:25 PM</span>
+                        <h3 class="info-title">Salt Lake City, Utah</h3>
+                        <div class="text-center o-auto">
+                            <div class="info-block">
+                                <dl>
+                                    <dt>13.5 M</dt>
+                                    <dd>Shares Traded</dd>
+                                </dl>
+                            </div>
+                            <div class="info-block last m-l-20">
+                                <dl>
+                                    <dt>28.44</dt>
+                                    <dd>Market Cap</dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="info-aapl">
+                            <h4>AAPL</h4>
+                            <ul>
+                                <li><span class="orange" style="height: 37.5%"></span>
+                                </li>
+                                <li><span class="orange" style="height: 47.5%"></span>
+                                </li>
+                                <li><span class="orange" style="height: 70%"></span>
+                                </li>
+                                <li><span class="orange" style="height: 85%"></span>
+                                </li>
+                                <li><span class="orange" style="height: 40%"></span>
+                                </li>
+                                <li><span class="green" style="height: 75%"></span>
+                                </li>
+                                <li><span class="green" style="height: 50%"></span>
+                                </li>
+                                <li><span class="green" style="height: 15%"></span>
+                                </li>
+                                <li><span class="green" style="height: 25%"></span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="yearly-change">
+                            <h4>Yearly Change</h4>
+                            <span><em>+</em> 127.01</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="section"></div>
+            </div> #}
+            <!-- Live-chart end -->
+            <!-- Last activity start -->
+            {# <div class="col-xl-7 col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Last Activity</h5>
+                        <div class="f-right">
+                            <label class="label label-success">Today</label>
+                            <label class="label label-danger">Month</label>
+                        </div>
+                    </div>
+                    <div class="card-block table-border-style">
+                        <div class="table-responsive analytic-table">
+                            <table class="table">
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <span class="count text-primary">2567</span>
+                                            <span class="table-msg">Total Message Sent</span>
+                                        </td>
+                                        <td>34%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="count text-success">3058</span>
+                                            <span class="table-msg">Last Activity</span>
+                                        </td>
+                                        <td>56%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="count text-inverse">6451</span>
+                                            <span class="table-msg">Total Message Received</span>
+                                        </td>
+                                        <td>84%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="count text-warning">9512</span>
+                                            <span class="table-msg">Monthly Income</span>
+                                        </td>
+                                        <td>79%</td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <span class="count text-info">9874</span>
+                                            <span class="table-msg">Total Transfer</span>
+                                        </td>
+                                        <td>81%</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div> #}
+            <!-- Last activity end -->
+            <!-- Morris site-visit chart start -->
+            {# <div class="col-md-6 col-xl-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Total Visitors</h5>
+                    </div>
+                    <div class="card-block">
+                        <div id="morris-site-visit"></div>
+                    </div>
+                </div>
+            </div> #}
+            <!-- Morris site-visit chart end -->
+            <!-- Pie Chart start -->
+            {# <div class="col-md-6 col-xl-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Daily Visitors</h5>
+                    </div>
+                    <div class="card-block">
+                        <div id="pie-chart" style="height:300px"></div>
+                    </div>
+                </div>
+            </div> #}
+            <!-- Pie Chart end -->
+            <!-- User activities chart start -->
+            {# <div class="col-md-6 col-xl-4">
+                <div class="card analytic-user">
+                    <div class="card-block-big text-center">
+                        <i class="icofont icofont-wallet"></i>
+                        <h1>$ 324587</h1>
+                        <h4>All Income</h4>
+                    </div>
+                    <div class="card-footer p-t-25 p-b-25">
+                        <p class="m-b-0">This is standard panel footer</p>
+                    </div>
+                </div>
+            </div> #}
+            <!-- User activities chart end -->
+
+            <!-- Social user card start -->
+            {# <div class="col-md-6 col-xl-4">
+                <div class="card borderless-card">
+                    <div class="profile-card">
+                        <img class="img-fluid" src="assets/images/widget/profile-person1.png" alt="">
+                        <div class="card-block">
+                            <h3>John Steve</h3>
+                            <p>UI/UX Designer at CreativesCastle Studio</p>
+                            <button class="btn btn-info">+ Follow</button>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-inverse">
+                        <div class="row text-center">
+                            <div class="col-sm-4">
+                                <h4>134</h4>
+                                <span>Shots</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <h4>13,227</h4>
+                                <span>Shots</span>
+                            </div>
+                            <div class="col-sm-4">
+                                <h4>488</h4>
+                                <span>Shots</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div> #}
+            <!-- Social user card end -->
+        </div>
+
+        <div class="row">
+
+
+            <div class="row col-md-7">
+                {# <div class="col-md-12 col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Population par région</h5>
+                        </div>
+                        <div class="card-block" style="height : 385px"><iframe class="chartjs-hidden-iframe" tabindex="-1" style="display: block; overflow: hidden; border: 0px; margin: 0px; inset: 0px; height: 100%; width: 100%; position: absolute; pointer-events: none; z-index: -1;"></iframe>
+                            <canvas id="chart_Combo" width="446" height="285" style="display: block; height: 397px; width: 397px;"></canvas>
+                        </div>
+                    </div>
+                </div> #}
+                {# <div class="col-md-12 col-lg-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Population urbaine/rurale</h5>
+                        </div>
+                        <div class="card-block">
+                            <div id="chart_Threshold" style="width: 100%; height: 332px;"></div>
+                        </div>
+                    </div>
+                </div> #}
+                {# <div class="col-md-12 col-lg-7">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>PYRAMIDE DES AGES</h5>
+                        </div>
+                        <div class="card-block" style="height : 628px"><iframe class="chartjs-hidden-iframe" tabindex="-1" style="display: block; overflow: hidden; border: 0px; margin: 0px; inset: 0px; height: 100%; width: 100%; position: absolute; pointer-events: none; z-index: -1;"></iframe>
+                            <canvas id="pyramide_age" width="350" height="250" style="display: block; height: 397px; width: 397px;"></canvas>
+                        </div>
+                    </div>
+                </div> #}
+            </div>
+            <div class="col-md-5">
+                {# <div class="col-md-12 col-xl-12">
+                    <div class="card user-activity-card">
+                        <div class="card-block-big">
+                            <h5>Population</h5>
+                            <h3 id="population_info" class="user-number">0</h3>
+                            <h6 class="m-b-15">Progression</h6>
+                            <div class="progress m-b-30">
+                                <div class="progress-bar progress-bar-striped progress-sm progress-bar-warning" role="progressbar"
+                                    style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <p class="text-info"><i class="icofont icofont-teacher"></i></p>
+                                    <h6 id="nb_hommes">42765</h6>
+                                </div>
+                                <div class="col-sm-6">
+                                    <p class="text-success"><i class="icofont icofont-girl-alt"></i></p>
+                                    <h6 id="nb_femmes">41098</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> #}
+                {# <div class="col-md-12 col-lg-5">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>Progession par region</h5>
+                        </div>
+                        <div class="card-block" style="height : 1"><iframe class="chartjs-hidden-iframe" tabindex="-1" style="display: block; overflow: hidden; border: 0px; margin: 0px; inset: 0px; width: 100%; position: absolute; pointer-events: none; z-index: -1;"></iframe>
+                            <canvas id="rapport_progression" width="6000" height="11700" style="display: block; height: 1000px; width: 397px;"></canvas>
+                        </div>
+                    </div>
+                </div> #}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+
+<script>
+
+$(document).ready(function(){
+        
+    // HIGHCHARTS POPULATION PAR REGION
+
+    (async () => {
+
+    const popDiv = await fetch(
+        "{{ asset('cartes/pref.json') }}"
+    ).then(response => response.json());
+
+    // Prepare demo data. The data is joined to map using value of 'hc-key'
+    // property by default. See API docs for 'joinBy' for more info on linking
+    // data and map.
+    const data = [
+        ['gn-7097', 10], ['gn-7087', 11], ['gn-7108', 12], ['gn-3417', 12],
+        ['gn-7106', 14], ['gn-3420', 66], ['gn-7098', 16], ['gn-7101', 17],
+        ['gn-7092', 18], ['gn-7088', 19], ['gn-7103', 20], ['gn-3416', 21],
+        ['gn-7094', 22], ['gn-7111', 23], ['gn-7109', 99], ['gn-7091', 25],
+        ['gn-3418', 72], ['gn-7105', 27], ['gn-3421', 28], ['gn-7099', 29],
+        ['gn-7104', 44], ['gn-7093', 67], ['gn-7107', 32], ['gn-7112', 87],
+        ['gn-7090', 34], ['gn-7110', 35], ['gn-7089', 36], ['gn-3419', 37],
+        ['gn-7096', 38], ['gn-7100', 39], ['gn-7102', 20], ['gn-7095', 41],
+        ['gn-3422', 42], ['gn-3423', 43]
+    ];
+    // console.log('LES REGIONS', popus);
+    // Create the chart
+    Highcharts.mapChart('couverture_carte', {
+        chart: {
+            map: popDiv
+        },
+
+        title: {
+            text: ''
+        },
+
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+
+        colorAxis: {
+            min: 0,
+            max: 100,
+            // type: 'linear',
+            minColor: '#d0f3bf',
+            maxColor: '#113102'
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.point.name + '</b><br>' +
+                        'Taux: <b>' + this.point.value + '</b>';
+            }
+        },
+
+        series: [{
+            data: data,
+            name: 'Taux de couverture',
+            states: {
+                hover: {
+                    color: '#85c225'
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function () {   
+                    return this.point.name + '<br>' +
+                        this.point.value + '</b>';
+                },
+                nullFormat: '0',
+            },
+        }]
+    });
+
+    })();
+
+
+
+    // HIGHCHARTS DENSITE POP PAR REGION
+    (async () => {
+
+    const testGuinee = await fetch(
+        "{{ asset('cartes/guinee.json') }}"
+    ).then(response => response.json());
+
+    // Prepare demo data. The data is joined to map using value of 'hc-key'
+    // property by default. See API docs for 'joinBy' for more info on linking
+    // data and map.
+    const data = [
+        ['Boké', 50], ['Conakry', 11], ['Faranah', 65], ['Kankan', 8],
+        ['Kindia', 14], ['Labé', 78], ['Mamou', 16], ['Nzérékoré', 24]
+    ];
+    // console.log('LES REGIONS', popus);
+    // Create the chart
+    Highcharts.mapChart('reg_taux', {
+        chart: {
+            map: testGuinee
+        },
+
+        title: {
+            text: ''
+        },
+
+        mapNavigation: {
+            enabled: true,
+            buttonOptions: {
+                verticalAlign: 'bottom'
+            }
+        },
+
+        colorAxis: {
+            min: 0,
+            max: 100,
+            // type: 'linear',
+            minColor: '#a5aaf1',
+            maxColor: '#090c35'
+        },
+        tooltip: {
+            formatter: function () {
+                return '<b>' + this.point.name + '</b><br>' +
+                        'Taux: <b>' + this.point.value + '</b>';
+            }
+        },
+
+        series: [{
+            data: data,
+            name: 'Taux de couverture',
+            states: {
+                hover: {
+                    color: '#85c225'
+                }
+            },
+            dataLabels: {
+                enabled: true,
+                formatter: function () {   
+                    return this.point.name + '<br>' +
+                        this.point.value + '</b>';
+                },
+                nullFormat: '0',
+            },
+        }]
+    });
+
+    })();
+
+
+    // Diagramme en barres
+
+    
+            // console.log('data', response);
+            attendu =  [100000, 8777689, 456432, 1456777, 67890, 5876543, 654321, 200000];
+            collecte = [80000, 4377689, 326432, 1116777, 60890, 3876543, 600001, 150000];   
+
+                var prog = {
+                labels:  ['Boké', 'Conakry', 'Faranah', 'Kankan', 'Kindia', 'Labé', 'Mamou', 'Nzérékoré'],
+                datasets: [
+                    {
+                        label: "Attendue",
+                        backgroundColor: 'rgba(102, 248, 69, 0.3)',
+                        borderWidth: 1,
+                        data: attendu,
+                        yAxisID: "bar-y-axis2",
+                    },
+                    {
+                        label: "Collectée",
+                        backgroundColor: '#23742f',
+                        borderWidth: 1,
+                        data: collecte,
+                        yAxisID: "bar-y-axis1",
+
+                    },
+                ],
+                };
+
+            var progbar = document.getElementById("rapport_progression").getContext('2d');
+            var myBarChart = new Chart(progbar, {
+                type: "horizontalBar",
+                data: prog,
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top' // place legend on the right side of chart
+                    },
+                    title: {
+                        display: true,
+                        text: 'Progression de la population collectée'
+                    },
+
+                    scales: {
+                        yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10,
+                        maxBarThickness: 20,
+                        minBarLength: 8,
+                        }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 20,
+                        maxBarThickness: 40,
+                        minBarLength: 16,
+                        // these are needed because the bar controller defaults set only the first x axis properties
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        },
+                        offset: true
+                        }],
+                        xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        }]
+
+                    }
+                },
+
+            }); 
+});
+
+
+function display_population_tab(requesturl){
+
+        //POPULATION
+        $.ajax({
+        type: "GET",
+        url: requesturl,
+        success: function (response) {
+            console.log('data', response);
+
+            // $('#population_info').html(response.pop);
+            // $('#pop_pourcentage_info').html(response.perc);
+            if(parseInt(response.perc) < 70){
+                if($("#id-client-blocks").hasClass("success-border")){
+                    $('#id-client-blocks').removeClass("success-border");
+                    $('#id-client-blocks').addClass("danger-border");
+                }
+
+                if($("#id-icofont-color").hasClass("text-success")){
+                    $('#id-icofont-color').removeClass("text-success");
+                    $('#id-icofont-color').addClass("text-danger");
+                }
+
+                if($("#id-value-card").hasClass("text-success")){
+                    $('#id-value-card').removeClass("text-success");
+                    $('#id-value-card').addClass("text-danger");
+                }
+
+            }else if(parseInt(response.perc) >= 70){
+                if($("#id-client-blocks").hasClass("danger-border")){
+                    $('#id-client-blocks').removeClass("danger-border");
+                    $('#id-client-blocks').addClass("success-border");
+                }
+
+                if($("#id-icofont-color").hasClass("text-danger")){
+                    $('#id-icofont-color').removeClass("text-danger");
+                    $('#id-icofont-color').addClass("text-success");
+                }
+
+                if($("#id-value-card").hasClass("text-danger")){
+                    $('#id-value-card').removeClass("text-danger");
+                    $('#id-value-card').addClass("text-success");
+                }
+
+            }
+
+
+            if(parseInt(response.couverture) < 70){
+                if($("#id-couv-client-blocks").hasClass("success-border")){
+                    $('#id-couv-client-blocks').removeClass("success-border");
+                    $('#id-couv-client-blocks').addClass("danger-border");
+                }
+
+                if($("#id-couv-icofont-color").hasClass("text-success")){
+                    $('#id-couv-icofont-color').removeClass("text-success");
+                    $('#id-couv-icofont-color').addClass("text-danger");
+                }
+
+                if($("#id-couv-value-card").hasClass("text-success")){
+                    $('#id-couv-value-card').removeClass("text-success");
+                    $('#id-couv-value-card').addClass("text-danger");
+                }
+
+            }else if(parseInt(response.couverture) >= 70){
+                if($("#id-couv-client-blocks").hasClass("danger-border")){
+                    $('#id-couv-client-blocks').removeClass("danger-border");
+                    $('#id-couv-client-blocks').addClass("success-border");
+                }
+
+                if($("#id-couv-icofont-color").hasClass("text-danger")){
+                    $('#id-couv-icofont-color').removeClass("text-danger");
+                    $('#id-couv-icofont-color').addClass("text-success");
+                }
+
+                if($("#id-couv-value-card").hasClass("text-danger")){
+                    $('#id-couv-value-card').removeClass("text-danger");
+                    $('#id-couv-value-card').addClass("text-success");
+                }
+
+            }
+
+            $('#pop_collecte').html(addSpaces(response.pop) );
+            $('#pop_carto').html(addSpaces(response.cartographie) );
+            $('#pop_attendu').html(addSpaces(response.attente));
+            $('#pop_progression').html(response.perc);
+            $('#pop_couverture').html(response.couverture);
+
+        },
+        error: function (status) {
+        }
+        });
+};
+
+function display_rapport_masculinite(requesturl){
+
+    $('#datebasechart').html(
+        '<div class="loader animation-start"><span class="circle delay-1 size-1"></span><span class="circle delay-2 size-2"></span><span class="circle delay-3 size-2"></span></div>'
+    );
+
+    //Line chart
+    $.ajax({
+        type: "GET",
+        url: requesturl,
+        success: function (response) {
+            console.log('data', response);
+
+                    var dataSource = [];
+                    response.map(stat =>{
+                        dataSource.push({
+                            'date': stat.group_age,
+                            'value': stat.ratio,
+                        });
+                    });
+
+                    var chart = AmCharts.makeChart('datebasechart', {
+                        "type": "serial",
+                        "theme": "light",
+                        "marginRight": 40,
+                        "marginLeft": 40,
+                        "autoMarginOffset": 20,
+                        "mouseWheelZoomEnabled": true,
+                        "valueAxes": [{
+                            "id": "v1",
+                            "axisAlpha": 0,
+                            "position": "left",
+                            "ignoreAxisWidth": true
+                        }],
+                        "balloon": {
+                            "borderThickness": 1,
+                            "shadowAlpha": 0
+                        },
+                        "graphs": [{
+                            "id": "g1",
+                            "balloon": {
+                                "drop": true,
+                                "adjustBorderColor": false,
+                                "color": "#ffffff"
+                            },
+                            // "bullet": "round",
+                            "bulletBorderAlpha": 1,
+                            "bulletColor": "#FFFFFF",
+                            "bulletSize": 5,
+                            "hideBulletsCount": 50,
+                            "lineThickness": 2,
+                            "title": "red line",
+                            "useLineColorForBulletBorder": true,
+                            "valueField": "value",
+                            "balloonText": "<span style='font-size:18px;'>[[value]]</span>"
+                        }],
+                        "chartScrollbar": {
+                            "graph": "g1",
+                            "oppositeAxis": false,
+                            "offset": 30,
+                            "scrollbarHeight": 80,
+                            "backgroundAlpha": 0,
+                            "selectedBackgroundAlpha": 0.1,
+                            "selectedBackgroundColor": "#888888",
+                            "graphFillAlpha": 0,
+                            "graphLineAlpha": 0.5,
+                            "selectedGraphFillAlpha": 0,
+                            "selectedGraphLineAlpha": 1,
+                            "autoGridCount": true,
+                            "color": "#AAAAAA"
+                        },
+                        "chartCursor": {
+                            "pan": true,
+                            "valueLineEnabled": true,
+                            "valueLineBalloonEnabled": true,
+                            "cursorAlpha": 1,
+                            "cursorColor": "#813515",
+                            "limitToGraph": "g1",
+                            "valueLineAlpha": 0.2,
+                            "valueZoomable": true
+                        },
+                        "valueScrollbar": {
+                            "oppositeAxis": false,
+                            "offset": 50,
+                            "scrollbarHeight": 10
+                        },
+                        "categoryField": "date",
+                        "categoryAxis": {
+                            "parseDates": false,
+                            "dashLength": 1,
+                            "minorGridEnabled": true
+                        },
+                        "export": {
+                            "enabled": true
+                        },
+                        "dataProvider": dataSource
+                    });
+                    
+            },
+        error: function (status) {
+        }
+    });
+};
+
+function display_pyramide_age(requesturl){
+
+    $('#pyramide_block_age').html(
+        '<div class="loader animation-start"><span class="circle delay-1 size-1"></span><span class="circle delay-2 size-2"></span><span class="circle delay-3 size-2"></span></div>'
+    );
+
+    /*Bar chart / pyramide des ages */
+    $.ajax({
+        type: "GET",
+        url: requesturl,
+        success: function (response) {
+            $('#pyramide_block_age').html(
+                '<canvas id="pyramide_age" style="display: block; height: 410px; width: 100%;"></canvas>'
+            );
+            // console.log('data', response);
+            // console.log('pyramide', response.for_male);
+            for_male = response.for_male;
+            for_female = response.for_female;    
+
+            var pyramide_age_data = {
+                labels: response.groupe_age,
+                datasets: [
+                    {
+                    label: "Hommes",
+                    stack: "Stack 0",
+                    backgroundColor: "#223298",
+                    data: for_male.map((k) => -k),
+                    },
+                    {
+                    label: "Femmes",
+                    stack: "Stack 0",
+                    backgroundColor: "#b6205f",
+                    data: for_female,
+                    },
+                ],
+            };
+
+            var bar = document.getElementById("pyramide_age").getContext('2d');
+            var myBarChart = new Chart(bar, {
+                type: "horizontalBar",
+                data: pyramide_age_data,
+                options: {
+                responsive: true,
+                title: {
+                    display: false,
+                },
+                tooltips: {
+                    intersect: false,
+                    callbacks: {
+                        label: (c) => {
+                            const value = Number(c.xLabel);
+                            //console.log("tool value", c);
+                            const positiveOnly = value < 0 ? -value : value;
+                            let retStr = "";
+                            if (c.datasetIndex === 0) {
+                            retStr += `Hommes: ${positiveOnly.toString()}`;
+                            } else {
+                            retStr += `Femmes: ${positiveOnly.toString()}`;
+                            }
+                            return retStr;
+                        },
+                    },
+                },
+                legend: {
+                    position: "top",
+                },
+                scales: {
+                    xAxes: [
+                    {
+                        // display: true,
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true,
+                            callback: (v) => {
+                                 return v < 0 ? -v: v 
+                            }
+                        },
+                    },
+                    ],
+                    yAxes: [
+                    {
+                        stacked: true,
+                        ticks: {
+                        beginAtZero: true,
+                        },
+                        position: "left",
+                        barPercentage: 0.5,
+                        categoryPercentage: 1.5,
+                    }
+                    ],
+                },
+                },
+            });        
+        },
+        error: function (status) {
+        }
+    });
+};
+
+function display_progression_pop(requesturl){
+
+    $('#rapport_block_progression').html(
+        '<div class="loader animation-start"><span class="circle delay-1 size-1"></span><span class="circle delay-2 size-2"></span><span class="circle delay-3 size-2"></span></div>'
+    );
+
+    /*Overlaping chart / Progression par région*/
+    $.ajax({
+        type: "GET",
+        url: requesturl,
+        success: function (response) {
+            $('#rapport_block_progression').html(
+                '<canvas id="rapport_progression" style="display: block; height: 410px; width: 100%;"></canvas>'
+            );
+
+            // console.log('data', response);
+            attendu = response.attendu;
+            collecte = response.collecte;    
+
+                var prog = {
+                labels: response.region,
+                datasets: [
+                    {
+                        label: "Attendue",
+                        backgroundColor: 'rgba(102, 248, 69, 0.3)',
+                        borderWidth: 1,
+                        data: attendu,
+                        yAxisID: "bar-y-axis2",
+                    },
+                    {
+                        label: "Collectée",
+                        backgroundColor: '#23742f',
+                        borderWidth: 1,
+                        data: collecte,
+                        yAxisID: "bar-y-axis1",
+
+                    },
+                ],
+                };
+
+            var progbar = document.getElementById("rapport_progression").getContext('2d');
+            var myBarChart = new Chart(progbar, {
+                type: "horizontalBar",
+                data: prog,
+                options: {
+                    responsive: true,
+                    legend: {
+                        position: 'top' // place legend on the right side of chart
+                    },
+                    title: {
+                        display: true,
+                        text: 'Progression de la population collectée'
+                    },
+
+                    scales: {
+                        yAxes: [{
+                        stacked: true,
+                        id: "bar-y-axis1",
+                        barThickness: 10,
+                        maxBarThickness: 20,
+                        minBarLength: 8,
+                        }, {
+                        display: false,
+                        stacked: true,
+                        id: "bar-y-axis2",
+                        barThickness: 20,
+                        maxBarThickness: 40,
+                        minBarLength: 16,
+                        // these are needed because the bar controller defaults set only the first x axis properties
+                        type: 'category',
+                        categoryPercentage: 0.8,
+                        barPercentage: 0.9,
+                        gridLines: {
+                            offsetGridLines: true
+                        },
+                        offset: true
+                        }],
+                        xAxes: [{
+                        stacked: false,
+                        ticks: {
+                            beginAtZero: true
+                        },
+                        }]
+
+                    }
+                },
+
+            });        
+        },
+        error: function (status) {
+        }
+    });
+
+}
+
+
+
+function display_suivi_remontees_superviseur(requesturl){
+
+    $.ajax({
+                type: "GET",
+                url: requesturl,
+                success: function (response) {
+
+                    if ( $.fn.dataTable.isDataTable( '#table_remontees_sup' ) ) {
+                        // table = $('#table_remontees_sup').DataTable();
+                        console.log('TABLE', table);
+                        $('#table_remontees_sup').DataTable().destroy();
+
+                        table = $('#table_remontees_sup').dataTable( {
+                            language: {
+                                url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                            },  
+                            "aaData": response,
+                            "columns": [
+                                { "data": "superviseur" },
+                                { "data": "departement" },
+                                { "data": "formatDate" },
+                                { "data": "nb_jour" },
+                            ],
+                            "retrieve": true
+                        });
+                    }
+                    else {
+                        table = $('#table_remontees_sup').dataTable( {
+                            language: {
+                                url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                            },  
+                            "aaData": response,
+                            "columns": [
+                                { "data": "superviseur" },
+                                { "data": "departement" },
+                                { "data": "formatDate" },
+                                { "data": "nb_jour" },
+                            ],
+                            "retrieve": true
+                        });
+                    }
+
+                    // COULEUR SUR LES LIGNES EN FONCTION DU NOMBRE DE JOUR SANS REMONTER
+
+                    var rows = table.$("tr");
+                    rows.each(function () {
+                        var nbJr = $(this).find('td').eq(3).text();
+                        console.log('nombre de jour', nbJr);
+                        if(parseFloat(nbJr) > 3 ){
+                            $(this).css('background-color', '#f5d8d8');
+                        } else if(parseFloat(nbJr) <= 3){
+                            $(this).css('background-color', '#e8f5e0');
+                        }
+                    });
+
+                },
+                error: function (status) {
+                }
+            });
+};
+
+
+
+function display_suivi_remontees_agent(requesturl){
+
+    $.ajax({
+                type: "GET",
+                url: requesturl,
+                success: function (response) {
+
+                    if ( $.fn.dataTable.isDataTable( '#table_remontees_ar' ) ) {
+                        // table = $('#table_remontees_ar').DataTable();
+                        console.log('TABLE', table);
+                        $('#table_remontees_ar').DataTable().destroy();
+
+                        table = $('#table_remontees_ar').dataTable( {
+                            language: {
+                                url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                            },  
+                            "aaData": response,
+                            "columns": [
+                                { "data": "agent" },
+                                { "data": "departement" },
+                                { "data": "dr_travail" },
+                                { "data": "formatDate" },
+                                { "data": "nb_jour" },
+                            ],
+                            "retrieve": true
+                        });
+                    }
+                    else {
+                        table = $('#table_remontees_ar').dataTable( {
+                            language: {
+                                url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                            },  
+                            "aaData": response,
+                            "columns": [
+                                { "data": "agent" },
+                                { "data": "departement" },
+                                { "data": "dr_travail" },
+                                { "data": "formatDate" },
+                                { "data": "nb_jour" },
+                            ],
+                            "retrieve": true
+                        });
+                    }
+
+                    // COULEUR SUR LES LIGNES EN FONCTION DU NOMBRE DE JOUR SANS REMONTER
+
+                    var rows = table.$("tr");
+                    rows.each(function () {
+                        var nbJr = $(this).find('td').eq(4).text();
+                        console.log('nombre de jour', nbJr);
+                        if(parseFloat(nbJr) > 3 ){
+                            $(this).css('background-color', '#f5d8d8');
+                        } else if(parseFloat(nbJr) <= 3){
+                            $(this).css('background-color', '#e8f5e0');
+                        }
+                    });
+
+                },
+                error: function (status) {
+                }
+            });
+};
+
+
+
+function addSpaces(nStr)
+{
+    var remainder = nStr.length % 3;
+    return (nStr.substr(0, remainder) + nStr.substr(remainder).replace(/(\d{3})/g, ' $1')).trim();
+}
+
+
+$(document).ajaxComplete(function(){
+    $('a[href="http://www.amcharts.com"]').each(function(){ 
+        //var oldUrl = $(this).attr("href"); // Get current url
+        //$(this).attr("href", ""); // Set herf value
+        $(this).html("")
+    });
+});
+</script>
+
+{% endblock %}

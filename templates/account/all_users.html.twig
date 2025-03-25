@@ -1,0 +1,618 @@
+{% extends "base.html.twig" %}
+
+{% block title %} LISTE DE TOUS LES UTILISATEURS {% endblock %}
+
+{% block body %}
+{# modal add User #}
+<div class="modal fade" id="addUtilisateur" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Ajout d'un utilisateur</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('users_add') }}"method="post" id="formAddOtherUser">
+                <div class="modal-body p-b-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" for="addFormCensusmpRoles">Profils*</label>
+                                <select class="form-control" id="addFormCensusmpRoles" multiple="multiple"  name="_roles"></select>
+                                <div class="help-block with-errors"></div>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="prenom">Prénom*</label>
+                                <input type="text" class="form-control" id="prenom" name="_prenom" placeholder="Entrez le prénom de l'utilisateur..." required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="nom">Nom de famille*</label>
+                                <input type="text" class="form-control" id="nom" name="_nom" placeholder="Nom de Famille" required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="telephone">Téléphone*</label>
+                                <input type="text" class="form-control" id="telephone" name="_telephone" placeholder="771231022">
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="cni">CNI*</label>
+                                <input type="text" class="form-control" id="cni" name="_cni" placeholder="1358199300883" required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="email">Email*</label>
+                                <input type="email" class="form-control" id="email" name="_email" placeholder="gphc5@gbos.sn" required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="adresse">Adresse</label>
+                                <input type="text" class="form-control" id="adresse" name="_adresse" placeholder="Adresse de l'utilisateur" required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="region">Région</label>
+                                <select name="_region" class="form-control" id="region" required>
+                                     <option value=""></option>
+                                    {% for row in regions %}
+                                        <option value="{{row.code}}">{{row.nom}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div> 
+                            <div class="form-group" id="dept-div">
+                                <label class="col-form-label" for="dept">Département</label>
+                                <select name="_dept" class="form-control" id="dept"></select>
+                            </div>
+                            {# compte user #}
+                            <div class="form-group">
+                                <label class="col-form-label" for="login">Login*</label>
+                                <input type="text" class="form-control" id="login" name="_login" placeholder="Entrez le login de l'utilisateur" required>
+                                <small class="form-text text-danger" id="loginError"></small>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-form-label" for="password">Mot de passe*</label>
+                                <input type="password" class="form-control" id="password" name="_password" placeholder="Entrez le password de l'utilisateur" required>
+                                <small class="form-text text-danger" id="passwordError"></small>
+                            </div>    
+                            <div class="form-group">
+                                <label class="col-form-label" for="confirmPassword">Confirmation mot de passe*</label>
+                                <input type="password" class="form-control" id="confirmPassword" data-match="#password" 
+                                       data-match-error="Les mots de passe ne correspondent pas" name="_confirmPassword" placeholder="Confirmer password de l'utilisateur">
+                                <div class="help-block with-errors"></div>
+                                <small class="form-text text-danger" id="confirmPasswordError"></small>
+                            </div>      
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-sm" id="btn-add-agent">Ajouter</button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{# modal Update User #}
+<div class="modal fade" id="editeUtilisateur" tabindex="-1">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modifier les infos de l'utilisateur</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form action="{{ path('users_update') }}" method="post" id="formUpdateOtherUser">
+                <div class="modal-body p-b-0">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="hidden" id="idOtherUser" name="_otherUser" />
+                            {# <div class="form-group">
+                                <label class="col-form-label" for="addFormCensusmpRolesMaj">Profils*</label>
+                                <select class="form-control" id="addFormCensusmpRolesMaj" multiple="multiple"  name="_roles"></select>
+                                <div class="help-block with-errors"></div>
+                            </div> #}
+                            <div class="form-group">
+                                <label class="col-form-label" for="prenomMaj">Prénom*</label>
+                                <input type="text" class="form-control" id="prenomMaj" name="_prenom" placeholder="Entrez le prénom de l'utilisateur..." required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="nomMaj">Nom de famille*</label>
+                                <input type="text" class="form-control" id="nomMaj" name="_nom" placeholder="Nom de Famille" required>
+                            </div> 
+                            <div class="form-group" >
+                                <label class="col-form-label" for="cniMaj">CNI*</label>
+                                <input type="text" class="form-control" id="cniMaj" name="_cni" placeholder="1358199300876">
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="telephoneMaj">Téléphone</label>
+                                <input type="text" class="form-control" id="telephoneMaj" name="_telephone" placeholder="771231022">
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="emailMaj">Email*</label>
+                                <input type="email" class="form-control" id="emailMaj" name="_email" placeholder="gphc5@gbos.sn" required>
+                            </div> 
+                            <div class="form-group">
+                                <label class="col-form-label" for="adresseMaj">Adresse</label>
+                                <input type="text" class="form-control" id="adresseMaj" name="_adresse" placeholder="Adresse de l'utilisateur" required>
+                            </div>
+                            {# compte user #}
+                            <div class="form-group">
+                                <label class="col-form-label" for="loginMaj">Login*</label>
+                                <input type="text" class="form-control" id="loginMaj" name="_login" placeholder="Entrez le login de l'utilisateur" required>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-sm" id="btn-update-agent">Enregistrer les modifications</button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Annuler</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="page-wrapper">   
+    <div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-block">
+                        <div class="table-responsive dt-responsive">
+                            <fieldset class="border p-2">
+                                <legend>
+                                    <h6>
+                                        <p>
+                                            <strong>UTILISATEURS</strong> &nbsp;
+                                            <button class="pull-right btn btn-sm btn-primary" 
+                                                    title="Ajouter un nouvel utilisateur"
+                                                    data-toggle="modal" 
+                                                    data-target="#addUtilisateur">
+                                                    <span style="font-size: 24px;" class="ti-plus"></span>
+                                            </button>
+                                            &nbsp;&nbsp;
+                                        </p>
+                                    </h6>
+                                </legend>
+                                <table id="dt-su" class="table table-striped table-bordered nowrap" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">DEPARTEMENT</th>
+                                            <th scope="col">PROFIL</th>
+                                            <th scope="col">PRENOM</th>
+                                            <th scope="col">NOM</th>
+                                            <th scope="col">ADRESSE</th>
+                                            <th scope="col">LOGIN</th>
+                                            <th scope="col">PASSWORD</th>
+                                            <th scope="col">Compte</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col" data-id="profils">Profils</th>
+                                            <th scope="col">PRENOM</th>
+                                            <th scope="col">NOM</th>
+                                            <th scope="col"></th>
+                                            <th scope="col">Login</th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    <script>
+
+        $(document).ready(function(){
+            $('#dept-div').hide();
+            var usersDt;
+            //tableSrc.ajax.reload();
+            //$('.edit-button-class').click(function(){
+            $(document).on ("click", ".edit-button-class", function (){
+                let id = $(this).data('id');
+                if(!id) {
+                    $('#editeUtilisateur').modal('toggle');
+                    $('#editeUtilisateur').modal('hide');
+
+                    return;
+                }
+                let email = $(this).data('email');
+                let prenom = $(this).data('prenom');
+                let nom = $(this).data('nom');
+                let telephone = $(this).data('tel');
+                let adresse = $(this).data('adresse');
+                let cni = $(this).data('cni');
+                let username = $(this).data('username');
+
+                $('#idOtherUser').val(id);
+                $('#prenomMaj').val(prenom);
+                $('#nomMaj').val(nom);
+                $('#telephoneMaj').val(telephone);
+                $('#adresseMaj').val(adresse);
+                $('#cniMaj').val(cni);
+                $('#emailMaj').val(email);
+                $('#loginMaj').val(username);
+
+                $('#editeUtilisateur').modal('toggle');
+                $('#editeUtilisateur').modal('show');
+            });
+
+
+            $('#region').change(function(){
+                let code = $(this).val();
+                $('#dept').html("");
+                $('#dept-div').hide();
+
+                $.ajax({
+                    url: "{{ path('app_prefectures_region') }}",
+                    data: { code: code },
+                    method: 'GET',
+                    success: function (departements) {
+                        $('#dept-div').show();
+                        $('#dept').attr('required', 'required');
+                        if (departements.length > 0){
+                            departements.map(dept => {
+                                $('#dept').append(`<option value='${dept.id}'>${dept.nom}</option>`);
+                            })
+                           
+                        }                        
+                    }, error: function (status, code) {
+                        $('#dept').html("");
+                        $('#dept-div').hide();
+                    }
+                });
+            });
+
+            $('#dt-su thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                //$(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                if (title) {
+                    if (title == "Profils"){
+                        var data = [
+                            {id: "ROLE_GEOMATICIEN", text: "GEOMATICIEN"},
+                            {id: "ROLE_ADMIN", text: "Coordination"},
+                            {id: "ROLE_ATIC", text: "ATIC"},
+                            {id: "ROLE_SRSD", text: "SRSD"},
+                            {id: "ROLE_CTR", text: "CTR"},
+                            {id: "ROLE_CTD", text: "CTD"},
+                            {id: "ROLE_SUPERVISEUR", text: "Superviseur Classique"},
+                            {id: "ROLE_SUPERVISEUR_RATISSAGE", text: "Superviseur ratissage"},
+                            {id: "ROLE_SUPERVISEUR_PCP", text: "Chef d'équipe PCP"},
+                            {id: "ROLE_RECRUIT_COM", text: "Comptes Commissions"},
+                            //{id: "ROLE_COM_MEMBER", text: "Membres Commissions"},
+                            {id: "ROLE_SRH", text: "SRH"},
+                            {id: "ROLE_SAL", text: "SAL"},
+                            {id: "ROLE_SCF", text: "SCF"},
+                            {id: "ROLE_CG", text: "CG"},
+                            
+                        ];
+                        const htmlContent = `<select  id="dt-users-profils-filter" class="form-control form-control-xs" size="height:none"></select>`;
+                        $(this).html(htmlContent);
+                        $("#dt-users-profils-filter").html( 
+                            `<option></option>`+(data.map(p => `<option value="${p.id}" >${p.text}</option>`) .join(''))
+                        );
+                    } else if (title == "Statut"){
+                        $(this).html( `<select  class="form-control form-control-xs" size="height:none">
+                                            <option></option>
+                                            <option value="1">Actif</option>
+                                            <option value="0">Non Actif</option>
+                                        </select>    
+                        `);
+                    } else {
+                        $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                    }
+                }
+            });
+
+            usersDt = $('#dt-su').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/en-gb.json'
+                },
+                "ajax": "{{ path('index_utilisateur') }}",
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20,10, 25, 50, 100],
+                "order": [[ 0, "desc" ]],
+                "columns": [
+                        { "data": "id", "visible": false },
+                        { "data": "departement", "default": "" },
+                        { "data": "roles", "orderable": false},
+                        { "data": "prenom" },
+                        { "data": "nom" },
+                        { "data": "adresse", "sortable": false },
+                        { "data": "email" },
+                        {'data': "password", "sortable": false},
+                        { "data": "isActived", "defaultContent": "" , "orderable": false,  render: function(data, type,row) { 
+                            return `<input  data-userName="${row.prenom} ${row.nom}"  
+                                            data-userid="${row.id}" 
+                                            class="statut-user" 
+                                            id="statut-user${row.id}" 
+                                            type="checkbox" 
+                                            class="js-small" ${row.isActived ? 'checked':''} />`; 
+                            } 
+                        },
+                        {sortable: false, "render": (data, type, row, meta) => {
+                            if(row.login != 'superadmin'){
+                            return `<button class="edit-button-class" 
+                                        data-id="${row.id}" 
+                                        data-username="${row.login}" 
+                                        data-prenom="${row.prenom}"
+                                        data-nom="${row.nom}"
+                                        data-tel="${row.phone}"
+                                        data-adresse="${row.adresse}"
+                                        data-email="${row.email}"
+                                        data-cni="${row.cni}"
+                                    > <i class="ti-pencil"></i>
+                                </button> &nbsp;
+                            `;
+                            } else {
+                                return ``;
+                            }
+                        }},
+                    ],
+
+                    initComplete: function () {
+                        // Apply the search
+                        this.api().columns().every( function () {
+                            var that = this;
+            
+                            $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                                
+                                if (e.keyCode == 13 && that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+
+                            $('select', this.header() ).on( 'change', function (e) {
+                                    
+                                if (that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+                        });
+                    },
+                    drawCallback: function(settings){
+                        document.querySelectorAll('.statut-user').forEach(function(elmt){
+                            var switchery = new Switchery(elmt, { color: '#1abc9c', jackColor: '#fff' });
+                        });
+                    }        
+            });
+
+            $('#addFormCensusmpRoles').select2({
+                delay: 100,
+                dropdownParent: $('#addUtilisateur'),
+                ajax: {
+                url: "{{ url('roles_index') }}",
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                    term: params.term,
+                    };
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (roles) {
+                    // Transforms the top-level key of the response object from 'items' to 'results'
+                    return {
+                    results: roles.map(function(role) { var r = { id:role.code , text:role.nom}; return r}),
+                    total: roles.length
+                    };
+                }
+                // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                }
+            });
+
+            $('#addFormCensusmpRolesMaj').select2({
+                delay: 100,
+                dropdownParent: $('#editeUtilisateur'),
+                ajax: {
+                url: "{{ url('roles_index') }}",
+                dataType: 'json',
+                data: function (params) {
+                    var query = {
+                    term: params.term,
+                    };
+                    // Query parameters will be ?search=[term]&type=public
+                    return query;
+                },
+                processResults: function (roles) {
+                    // Transforms the top-level key of the response object from 'items' to 'results'
+                    return {
+                    results: roles.map(function(role) { var r = { id:role.code , text:role.nom}; return r}),
+                    total: roles.length
+                    };
+                }
+                // Additional AJAX parameters go here; see the end of this chapter for the full code of this example
+                }
+            });
+            // Permet d'ajouter un user
+            $('#formAddOtherUser').submit(function(e){
+
+                $("#btn-add-agent").removeAttr("disabled");
+
+                //prevent default
+                e.preventDefault();
+
+                //do something here
+                $("#btn-add-agent").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('others_users_add') }}",
+                    data: { 
+                        '_prenom': $("#prenom").val(), 
+                        '_nom':    $("#nom").val(), 
+                        '_telephone': $("#telephone").val(), 
+                        '_adresse': $("#adresse").val(), 
+                        '_roles': $("#addFormCensusmpRoles").val(), 
+                        '_dept': $("#dept").val(), 
+                        '_login': $("#login").val(), 
+                        '_password': $("#password").val(), 
+                        '_email': $("#email").val(), 
+                        '_cni': $("#cni").val(), 
+                        '_login': $("#login").val(), 
+                        '_password': $("#password").val(),
+                    },
+                    success: function (response) { 
+                        $('#addUtilisateur').modal('toggle');
+                        $('#addUtilisateur').modal('hide');   
+                        $("#btn-add-agent").removeAttr("disabled");
+                        usersDt.ajax.reload();                    
+                    },
+                    error: function (response) {
+                        $('#addUtilisateur').modal('toggle');
+                        $('#addUtilisateur').modal('hide');  
+                        $("#btn-add-agent").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+
+            // Permet d'éditer un user
+            $('#formUpdateOtherUser').submit(function(e){
+
+                //prevent default
+                e.preventDefault();
+
+                $("#btn-update-agent").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ path('others_users_update') }}",
+                    data: { 
+                        '_id': $("#idOtherUser").val(),
+                        '_prenom': $("#prenomMaj").val(), 
+                        '_nom':    $("#nomMaj").val(), 
+                        '_telephone': $("#telephoneMaj").val(), 
+                        '_adresse': $("#adresseMaj").val(), 
+                        '_email': $("#emailMaj").val(), 
+                        '_login': $("#loginMaj").val(), 
+                        '_cni': $("#cniMaj").val(), 
+                    },
+                    success: function (response) {                         
+                        $('#editeUtilisateur').modal('toggle');
+                        $('#editeUtilisateur').modal('hide');   
+                        usersDt.ajax.reload();                    
+                        $("#btn-update-agent").removeAttr("disabled");
+                    },
+                    error: function (response) {                        
+                        $('#editeUtilisateur').modal('toggle');
+                        $('#editeUtilisateur').modal('hide');  
+                        $("#btn-update-agent").removeAttr("disabled");
+                    }
+                })
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+
+
+            validatePassword();
+
+            // Permet la validation du password
+            function validatePassword(){
+                let password = $('#password').val();
+                let confirmPassword = $('#confirmPassword').val();
+
+                $('#password').keyup(function(){
+                    confirmPassword = $('#confirmPassword').val();
+                    if(confirmPassword !== "" && confirmPassword === $(this).val()){
+                        $('#password').css({"color":"green"});
+                        $('#confirmPassword').css({"color":"green"});
+
+                        $('#btn-add-agent').prop('disabled', false);
+
+                        $("#passwordError").html("");
+                        $("#confirmPasswordError").html("");
+                    } else if(confirmPassword !== "" && confirmPassword !== $(this).val()){
+                        $('#password').css({"color":"red"});
+                        $('#btn-add-agent').prop('disabled', true);
+
+                        $("#passwordError").html("Le Password est différent de la confirmation !");
+                        $('#passwordError').css({"color":"red"});
+                    }
+                });
+
+                $('#confirmPassword').keyup(function(){
+                    password = $('#password').val();
+                    if(password !== "" && password === $(this).val()){
+                        $('#confirmPassword').css({"color":"green"});
+                        $('#password').css({"color":"green"});
+
+                        $('#btn-add-agent').prop('disabled', false);
+
+                        $("#confirmPasswordError").html("");
+                        $("#passwordError").html("");
+                    } else if(password !== "" && password !== $(this).val()){
+                        $('#confirmPassword').css({"color":"red"});
+
+                        $('#btn-add-agent').prop('disabled', true);
+
+                        $("#confirmPasswordError").html("Le Password de confirmation est différent !");
+                        $('#confirmPasswordError').css({"color":"red"});
+
+                    }
+                });
+            }
+
+            $(document).on ("change", ".statut-user", function (){
+                var  myCheckbox= $(this)[0];
+                var newValue = $(this)[0].checked;
+                var userid = $(this).data('userid');
+                var username = $(this).data('username');
+                var lockAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            type: "POST",
+                            url: Routing.generate('app_account_lock_unlock_persist', {'id':userid , 'enabled': newValue == true ? 'on': 'off'}),
+                            success: function (response) {
+                            resolve();
+                            },
+                            error: function (response) {
+                                reject(response.responseJSON.erreur);
+                            }
+                        })
+                    });
+                };
+            
+                confirmationToExecutePromise(
+                    'Voulez vous '+(newValue ? ' Activer ': ' Désactiver')+' le Compte de '+username+' ?',
+                    'Reussie',
+                    (newValue  ? 'Activation de compte': 'Désactivation de compte'), 
+                    lockAction
+                    ).then(function(){
+                },function(){
+                    myCheckbox.checked = !newValue ;
+                    $('#'+myCheckbox.id).siblings("span.switchery").remove();
+                    new Switchery(document.querySelector('#'+myCheckbox.getAttribute('id')+''), { color: '#1abc9c', jackColor: '#fff' });
+                    
+                });
+     
+                 
+             });
+
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,783 @@
+{% extends "base.html.twig" %}
+
+{% block title %} Composition du formateur {{ sp.name ~" "~ sp.surname ~" | "~ sp.username  }} {% endblock %}
+
+
+{% block body %}
+
+{# Modal - ajout note finale #}
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalTitle">Formulaire d'attribution de note finale</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" id="formUpdate">
+                <div class="modal-body p-b-0">
+                    <input type="hidden" id="slug" />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label class="col-form-label" for="noteFinale">Note finale<span class="text-danger">*</span></label>
+                                <input type="number" step="any" name="noteFinale" id="noteFinale" class="form-control" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary btn-sm" id="btnUpdate">Attribuez la note</button>
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Fermer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{# /Modal - ajout note finale #}
+
+<div class="page-wrapper">
+	<div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-block">
+                        <ul class="nav nav-tabs  tabs" role="tablist">
+                            <li class="nav-item col">
+                                <a class="nav-link active" data-toggle="tab" href="#menTab" role="tab">Préparation de la salle</a>
+                            </li>
+                            <li class="nav-item col">
+                                <a class="nav-link" data-toggle="tab" href="#concTab" role="tab">Salle de formation</a>
+                            </li>
+                            <li class="nav-item col">
+                                <a class="nav-link" data-toggle="tab" href="#presentiel" role="tab">Listes des présences</a>
+                            </li>
+                        </ul>
+                        <!-- Tab panes -->
+                        <div class="tab-content tabs card-block">
+                            {# ajout d'agent dans la salle #}
+                            <div class="tab-pane active" id="menTab" role="tabpanel">
+                                <p class="m-0">
+                                    <div class="col-xl-12">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="table-responsive">
+                                                    <p>
+                                                        <fieldset class="border" id="filteredId">
+                                                            <legend>
+                                                                <h6>
+                                                                    <p>Cocher Par Numéro d'ordre</p>
+                                                                </h6>
+                                                            </legend>
+                                                            <form class="form-inline ml-3 pb-1">
+                                                                <div class="form-group row">
+                                                                    <label for="de" class="col-sm-1 col-form-label">De</label>
+                                                                    <div class="col-sm-1">
+                                                                        <input type="number" class="form-control" name="de" id="de" />
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group row">
+                                                                    <label for="a" class="col-sm-1 col-form-label">À</label>
+                                                                    <div class="col-sm-1">
+                                                                        <input type="number" class="form-control" name="a" id="a" />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    &nbsp;<button type="button" id="cocher" class="btn btn-primary btn-sm">Coher <i class="ti-check-box"></i></button>
+                                                                </div>
+
+                                                                <div class="form-group">
+                                                                    &nbsp;<button type="button" id="uncocher" class="btn btn-primary btn-sm">Tout décocher</button>
+                                                                </div>
+                                                            </form>
+                                                        </fieldset>
+                                                    </p>
+                                                    <table id="usersDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col"></th>
+                                                                <th scope="col">N°</th>
+                                                                <th scope="col">Cocher</th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">LGA</th>
+                                                                <th scope="col">District</th>
+                                                                <th scope="col">Prénom(s)</th>
+                                                                <th scope="col">Nom</th>
+                                                                <th scope="col">Age</th>
+                                                            </tr>
+                                                            <tr>
+                                                                <th scope="col"></th>
+                                                                <th scope="col"></th>
+                                                                <th scope="col"></th>
+                                                                <th scope="col">Score</th>
+                                                                <th scope="col">LGA</th>
+                                                                <th scope="col">District</th>
+                                                                <th scope="col">Prénom(s)</th>
+                                                                <th scope="col">Nom</th>
+                                                                <th scope="col"></th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>    
+                                                    <div class="text-center">
+                                                        <button type="button" id="btnAddToClass" class="btn btn-primary btn-sm">Affecter au superviseur</label>
+                                                    </div>                                           
+                                                </div>                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+
+                            {# salle du superviseur #}
+                            <div class="tab-pane" id="concTab" role="tabpanel">
+                                <p class="m-0">
+                                    <div class="row">
+                                        <div class="col-xl-12">
+                                            <div class="card">
+                                                <div class="card-block">
+                                                    <div class="table-responsive">
+                                                        <table id="candidatsDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">LGA</th>
+                                                                    <th scope="col">District</th>
+                                                                    <th scope="col">Prénom(s)</th>
+                                                                    <th scope="col">Nom</th>
+                                                                    <th scope="col">Paramètres</th>
+                                                                    <th scope="col">Nombre présence</th>
+                                                                    <th scope="col">Note finale</th>
+                                                                    <th scope="col">Actions</th>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col">LGA</th>
+                                                                    <th scope="col">District</th>
+                                                                    <th scope="col">Prénom(s)</th>
+                                                                    <th scope="col">Nom</th>
+                                                                    <th scope="col">Username</th>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col"></th>
+                                                                    <th scope="col"></th>
+                                                                </tr>
+                                                            </thead>
+                                                        </table>   
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+
+                            {# Presentiel #}
+                            <div class="tab-pane" id="presentiel" role="tabpanel">
+                                <p class="m-0">
+                                    <div class="col-lg-12">
+                                        <div class="card">
+                                            <div class="card-block">
+                                                <div class="row">
+                                                    <div class="offset-3">
+                                                        {# <fieldset class="border"> #}
+                                                            {# <legend>
+                                                                <h6>
+                                                                    <p>Définition du jour de formation</p>
+                                                                </h6>
+                                                            </legend> #}
+                                                            <form class="form-inline">
+                                                                <div class="col-4">Définition du jour</div>
+                                                                <div class="col-4">
+                                                                    <input type="date" class="form-control" id="ladate" required />
+                                                                </div>
+                                                                <div class="col-4">
+                                                                    &nbsp;<button type="button" id="createDate" class="btn btn-primary btn-sm">Enregistrer</label>
+                                                                </div>
+                                                            </form>
+                                                        {# </fieldset> #}
+                                                    </div>
+                                                </div>  
+                                                <div class="table-responsive pt-2">
+                                                    <table id="datesDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                                        <thead>
+                                                            <tr>
+                                                                {# <th scope="col"></th> #}
+                                                                <th scope="col">Date de la formation</th>
+                                                                <th scope="col">Nombre Présence</th>
+                                                                <th scope="col">Nombre Absence</th>
+                                                                <th scope="col">Présences</th>
+                                                                <th scope="col">Feuilles de Présence</th>
+                                                                <th scope="col">Retirer</th>
+                                                            </tr>
+                                                        </thead>
+                                                    </table>    
+                                                </div>                                               
+                                            </div>
+                                        </div>
+                                    </div>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    
+    <script type="text/javascript" src="{{ asset('dist/js/multiselect.js') }}"></script>
+
+
+    <script>
+        var myDt, candidatDt, formationDt;
+        $(document).ready(function(){
+
+            const SLUG = "{{ sp.slug }}";
+            var candidats = [];
+
+            $('a[data-toggle="tab"]').click(function(){
+                let hrefVal = $(this).attr('href');
+
+                switch(hrefVal) {
+                    case '#concTab':
+                        $('#concTab').show();
+                        $('#menTab').hide();
+                        $('#presentiel').hide();
+                        break;
+                    case '#menTab':
+                        $('#menTab').show();
+                        $('#concTab').hide();
+                        $('#presentiel').hide();
+                        break;
+                    case '#presentiel':
+                        $('#presentiel').show();
+                        $('#menTab').hide();
+                        $('#concTab').hide();
+                        break;
+                    default:
+                        // code block
+                }
+            });
+
+            // ------ tab 1 ------- //
+            $('#candidatsDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+            candidatDt = $('#candidatsDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('sp_team_list', {slug: SLUG}),
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10, 20, 25, 50, 100],
+                "order": [[ 0, "desc" ]],
+                "columns": [
+                    { "data": "id", "visible": false },
+                    { "data": "lga.name" },
+                    { "data": "district.name" },
+                    { "data": "enumerator.name" },
+                    { "data": "enumerator.surname" },
+                    { "data": "username", "render" : (data,type,row, meta)=> {
+                        return `${row.username} | ${row.password}`;
+                    }},
+                    { "data": "username", "render" : (data,type,row, meta)=> {
+                        return `${row.totalPresence} fois`;
+                    }},
+                    { "data": "note", "render" : (data,type,row, meta)=> {
+                        return `${row.note}`;
+                    }},
+                    { sortable: false ,"render" : (data,type,row, meta)=> {
+                        return `<button class="remove-button-class ${!row.isProfile ? 'bg-danger' : '' }" 
+                                    data-id="${row.slug}" 
+                                    data-prenom="${row.enumerator.name}"
+                                    data-nom="${row.enumerator.surname}"
+                                    ${row.isProfile || row.totalPresence > 0 ? 'disabled' : '' }
+                                > <i class="fa fa-remove"></i>
+                            </button>`;
+                    }},
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+                    });
+                },
+                drawCallback: function(settings){
+                    $("#candidatsDt_filter").hide();
+                }        
+            });
+
+            $('#btnAddToClass').prop('disabled', true);
+
+            // -------- TAB 2 -------------------
+            $('#usersDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+           
+            $('#usersDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    if (title == "Liste") {
+                        $(this).html( `<select  class="form-control form-control-xs" size="height:none">
+                                        <option value="" selected>Tous</option>
+                                        <option value="principale">Principale</option>
+                                        <option value="attente">Attente</option>
+                                    </select>    
+                        `);
+                    } else {
+                        $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                    }
+                }
+            });
+
+            myDt = $('#usersDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_unaffected_project_candidats'),
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10, 20, 25, 50, 100],
+                "order": [[ 3, "desc" ]],
+                "columns": [
+                        { "data": "id", "visible": false },
+                        {'data': 'id', sortable: false, sortable: false},
+                        {'data': 'id', sortable: false, 'render': function(data,type,row){
+                                return `<input type="checkbox" name="candidat" class="candidatesClass" value='${row.id}'/>`; 
+                            }
+                        },
+                        { "data": "score" },
+                        { "data": "lga.name" },
+                        { "data": "workDistrict.name" },
+                        { "data": "name" },
+                        { "data": "surname" },
+                        { sortable: false, orderable: false, "render": (data,type,row, meta) => {
+                            return `${row.age} ans`;
+                        }},
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                        $('select', this.header() ).on( 'change', function (e) {
+                            if (that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });   
+                    });
+                },
+                drawCallback: function(settings){
+                    if(myDt.data().length > 0){
+                        $('#filteredId').show();
+                        $("#usersDt_filter").hide();
+
+                        $('#de').val(1);
+                        $('#a').val(myDt.data().length);
+                    } else {
+                        $('#filteredId').hide();
+                    }
+                }        
+            });
+
+            myDt.on('draw.dt', function () { var info = myDt.page.info(); myDt.column(1, { search: 'applied', order: 'applied', page: 'applied' }).nodes().each(function (cell, i) { cell.innerHTML = i + 1 + info.start; }); });
+
+            // checked - unchecked
+            $("#uncocher").click(function(){
+                candidats = [];
+                $('input[name="candidat"]').prop('checked', false);
+                $('#btnAddToClass').prop('disabled', true);
+            });
+
+            $("#cocher").click(function(){
+                candidats = [];
+                var de = $('#de').val();
+                var a = $('#a').val();
+                var dtSize = myDt.data().length; // nombre de lignes du datatable
+                
+                $('#selectAll').prop('checked', false);
+                $('input[name="candidat"]').prop('checked', false);
+
+                if (de <= 0) {
+                    Swal.fire(
+                        'Alerte !',
+                        "Le n° de debut doit être supérieur à 0.",
+                        'info'
+                    );
+                    return;
+                } else if (de > a) {
+                    Swal.fire(
+                        'Alerte !',
+                        `Le n° de debut doit être inférieur ou égal ${dtSize}.`,
+                        'info'
+                    );
+                    return;
+                } else if (a > dtSize) {
+                    Swal.fire(
+                        'Alerte !',
+                        `Le n° de fin doit être inférieur ou égal à ${dtSize}`,
+                        'info'
+                    );
+                    return;
+                }
+
+
+                $('input[name="candidat"]').each(function(){
+                   var row = $(this).closest("tr").find("td").eq(0);
+                   var rowIndex = parseInt(row[0].innerText);
+
+                   if (rowIndex >= de && rowIndex <= a) {
+                    $(this).prop('checked', true);
+                    candidats.push($(this).val());
+                   }
+
+                });
+
+                $('#btnAddToClass').removeAttr('disabled');
+
+                console.log(candidats)
+            })
+
+            $(document).on("change", ".candidatesClass", function (e){
+                if (!e.target.checked){
+                    candidats = candidats.filter(c => c != $(this).val());
+                } else {
+                    var sThisVal = (this.checked ? $(this).val() : "");
+                    candidats.push(sThisVal);
+                }
+
+                if (candidats.length > 0) {
+                    $('#btnAddToClass').removeAttr('disabled');
+                } else {
+                     $('#btnAddToClass').prop('disabled', true);
+                }
+
+            });
+
+            // save
+            $(document).on ("click", "#btnAddToClass", function (){
+
+                if(candidats.length == 0) {
+                    return;
+                }
+
+                //console.table(candidats);
+
+                let prenom = "{{ sp.name }}";
+                let nom = "{{ sp.surname }}";
+
+                var saveAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_affect_enumerators_to_sp', {slug: SLUG }),
+                            data: {'_candidatIds': candidats},
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                Swal.fire(
+                                    'information',
+                                    repMsg,
+                                    'info'
+                                );
+                                $('.censusmp-loader').hide();
+                                myDt.ajax.reload();
+                                candidatDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de vouloir affecter ses agents au superviseur ${prenom} ${nom} ?`,'Affection réussie', '', saveAction).then(function(){
+                    myDt.ajax.reload();
+                    candidatDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+
+            // remove candidat from classroom
+            $(document).on ("click", ".remove-button-class", function (){
+
+                let slug = $(this).data('id');
+                if(!slug) {
+                    return;
+                }
+                let prenom = $(this).data('prenom');
+                let nom = $(this).data('nom');
+
+                var deleteAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('remove_enumerator_from_classroom', {slug: slug }),
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('.censusmp-loader').hide();
+                                myDt.ajax.reload();
+                                candidatDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de supprimer le superviseur ${prenom} ${nom} ?`,'Remove enumerator', '', deleteAction).then(function(){
+                    //zcDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+
+            // -------------- formations --------- //
+            formationDt = $('#datesDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_sp_presentiels', {slug: SLUG}),
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                "pageLength": 20,
+                "lengthMenu": [ 10, 20],
+                //"order": [[ 0, "asc" ]],
+                "columns": [
+                        { "data": "dayAt", sortable: false, orderable: false },
+                        { "data": "nbrPresence", sortable: false, orderable: false },
+                        { "data": "nbrAbsence", sortable: false, orderable: false },
+                        { sortable: false ,"render" : (data,type,row, meta)=> {
+                            let pUrl = Routing.generate('app_sp_day_presentiel', {slug: row.slug});
+                            return `<a href="${pUrl}" 
+                                        title="voir la liste de présence"
+                                        > <i class="ti-eye"></i>
+                                    </a>`;
+                        }},
+                        { className: "text-center", sortable: false ,"render" : (data,type,row, meta)=> {
+                            if (row.nbrFeuille > 0) {
+                                let file_download_url = Routing.generate('app_presentiel_zip', {slug: row.slug});
+                                return `<a href="${file_download_url}" target="_blank"
+                                        > ${row.nbrFeuille} <i class="fa fa-download"></i>
+                                    </a>`;
+                            } else {
+                                return 'aucune feuille'
+                            }
+                        }},
+                        { sortable: false ,"render" : (data,type,row, meta)=> {
+                            return `<button class="deleteDate ${row.nbrFeuille > 0 ? '' : 'bg-danger'}" 
+                                        data-id="${row.slug}" 
+                                        data-date="${row.dayAt}" 
+                                        ${row.nbrFeuille > 0 ? 'disabled' : ''}
+                                    > <i class="ti-trash"></i>
+                                </button>`;
+                            
+                        }},
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });
+
+                    });
+                },
+                drawCallback: function(settings) {
+                    $("#datesDt_filter").hide();
+                }        
+            });
+
+            // save jour formation
+            $(document).on ("click", "#createDate", function (){
+
+                let ladate = $('#ladate').val();
+
+                if(ladate == "") {
+                    return;
+                }
+
+                var saveAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_sp_training_save', {slug: SLUG }),
+                            data: {'_dayAt': ladate},
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('.censusmp-loader').hide();
+                                formationDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de retenir cette date comme un jour de formation ?`,'Jour formation', '', saveAction).then(function(){
+                });
+
+               return;
+               
+            });
+
+            // delete date formation
+            $(document).on ("click", ".deleteDate", function (){
+
+                let slug = $(this).data('id');
+                if(!slug) {
+                    return;
+                }
+
+                let dateAt = $(this).data('date');
+
+                var deleteAction =  function(){
+                    return new Promise(function(resolve,reject){
+                        $.ajax({
+                            url: Routing.generate('app_sp_presentiel_delete', {slug: slug }),
+                            dataType: "json",
+                            method: "POST",
+                            beforeSend: function(){
+                                $('.censusmp-loader').show();
+                            },
+                            success: function (repMsg) {
+                                $('.censusmp-loader').hide();
+                                formationDt.ajax.reload();
+                            }, error: function(status, text) {
+                                $('.censusmp-loader').hide();
+                                console.error(status);
+                            }
+                        });
+                    });
+                };
+                confirmationToExecutePromise(`Etes-vous sûre de supprimer la formation de la date du ${dateAt} ?`,'Suppression jr formation', '', deleteAction).then(function(){
+                    //zcDt.ajax.reload();                    
+                });
+
+               return;
+               
+            });
+
+            // Attribution de notes
+            $(document).on ("click", ".note-button-class", function (){
+                
+                let slug = $(this).data('id');
+                if(!slug) {
+                    return;
+                }
+                let prenom = $(this).data('prenom');
+                let nom = $(this).data('nom');
+                let note = $(this).data('note');
+
+                $("#slug").val(slug)
+                $('#noteFinale').val(note);
+
+                $('#editModalTitle').html(`Formulaire d'attribution d'une note finale de formation [<b>${prenom} ${nom}</b>]`);
+
+                $('#editModal').modal('toggle');
+                $('#editModal').modal('show');
+
+            });
+
+            $('#formUpdate').submit(function(e){
+
+                e.preventDefault();
+           
+                let noteFinale = $('#noteFinale').val();              
+                
+                if (noteFinale == "") {
+                    return "";
+                }
+
+                $("#btnUpdate").attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: Routing.generate('app_training_save_candidat_final_note', {id: $("#slug").val()}),
+                    data: { note: noteFinale },
+                    success: function (response) { 
+                        
+                        console.log(response);
+                        $("#btnUpdate").removeAttr("disabled");
+
+                        $('#editModal').modal('hide');
+                        $('#editModal').on('hidden.bs.modal', function() {
+                            $('#editModal').trigger('click');
+                        }); 
+
+                        candidatDt.ajax.reload(); 
+                    },
+                    error: function (status, text) {
+                        console.error(status);                       
+                        $("#btnUpdate").removeAttr("disabled");
+                    }
+                });
+
+                //continue submitting
+                return;
+                e.currentTarget.submit();
+
+            });
+
+            
+        });
+    </script>
+
+{% endblock %}

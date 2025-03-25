@@ -1,0 +1,163 @@
+{% extends "base.html.twig" %}
+
+{% block title %} List of enumerators {% endblock %}
+
+
+{% block body %}
+
+<div class="page-wrapper">
+	<div class="page-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-block">
+                         <div class="row">
+                            <div class="col-md-12 col-xl-4" style="padding-right: 3px;">
+                                <div class="card social-widget-card">
+                                    <div class="card-block-big text-info" style="padding: 1.5em; border-top-width: 4px; border-top-style: solid; border-top-color :#0077B5;">
+                                        <h3 id="total_uers">{{ totalCandidat }}</h3>
+                                        <span class="m-t-10">Total Enumerators</span>
+                                        <i class="fa fa-users"></i>
+                                        <i class="fa fa-users"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <div class="col-md-12 col-xl-4" style="padding-right: 3px;">
+                                <div class="card social-widget-card">
+                                    <div class="card-block-big text-info" style="padding: 1.5em; border-top-width: 4px; border-top-style: solid; border-top-color :#0077B5;">
+                                        <h3 id="total_no_cc">{{ totalInClassRoom }}</h3>
+                                        <span class="m-t-10">In Classroom</span>
+                                        <i class="fa fa-mortar-board"></i>
+                                        <i class="fa fa-mortar-board"></i>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12 col-xl-4" style="padding-right: 3px;">
+                                <div class="card social-widget-card">
+                                    <div class="card-block-big text-info" style="padding: 1.5em; border-top-width: 4px; border-top-style: solid; border-top-color :#0077B5;">
+                                        <h3 id="total_cc">{{ totalProfile }}</h3>
+                                        <span class="m-t-10">Total Profile</span>
+                                        <i class="icofont icofont-prescription"></i>
+                                        <i class="icofont icofont-prescription"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pt-3">
+                            <div class="table-responsive">
+                                <table id="usersDt" class="table table-hover table-condensed table-sm table-bordered nowrap" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">LGA</th>
+                                            <th scope="col">District</th>
+                                            <th scope="col">Score</th>
+                                            <th scope="col">Surname</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Téléphone</th>
+                                            <th scope="col">Age</th>
+                                        </tr>
+                                        <tr>
+                                            <th scope="col">ID</th>
+                                            <th scope="col">LGA</th>
+                                            <th scope="col">District</th>
+                                            <th scope="col">Score</th>
+                                            <th scope="col">Surname</th>
+                                            <th scope="col">Name</th>
+                                            <th scope="col">Téléphone</th>
+                                            <th scope="col"></th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+    
+    <script type="text/javascript" src="{{ asset('dist/js/multiselect.js') }}"></script>
+
+    <script>
+        var myDt;
+        $(document).ready(function(){
+
+            $('#usersDt thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Recherche '+title+'" />' );
+                }
+            });
+
+            myDt = $('#usersDt').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },    
+                "ajax": Routing.generate('app_candidats_home'),
+                //'dom': 'lrt',
+                //'searching': false,
+                "paging": true,
+                "serverSide": true,
+                "processing": true,
+                //"bInfo" : false,
+                "pageLength": 20,
+                "lengthMenu": [ 10,20, 25, 50, 100],
+                "order": [[ 3, "desc" ]],
+               // "responsive": true,
+                "columnDefs": [
+                    {
+                        "targets": [0],
+                        "visible": false,
+                        "searchable": false
+                    },
+                ],
+                "columns": [
+                    { "data": "id" },
+                    { "data": "lga.name" },
+                    { "data": "district.name" },
+                    { "data": "score" },
+                    { "data": "name" },
+                    { "data": "surname" },
+                    { "data": "phone" },
+                    { sortable: false, "render": (data,type,row, meta) => {
+                        return `${row.age} ans`;
+                    }},
+                ],
+                initComplete: function () {
+                    // Apply the search
+                    this.api().columns().every( function () {
+                        var that = this;
+        
+                        $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                            
+                            if (e.keyCode == 13 && that.search() !== this.value ) {
+                                that
+                                    .search( this.value )
+                                    .draw();
+                            }
+                        });                                    
+
+                    });
+                },
+                rowCallback: function (row, data) {
+                    //console.log(data)
+                },
+                drawCallback: function(settings){
+                    $("#usersDt_filter").hide();
+                },    
+            });
+           
+        });
+    </script>
+
+{% endblock %}

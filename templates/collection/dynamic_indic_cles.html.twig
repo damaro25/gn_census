@@ -1,0 +1,237 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+        TABLEAU DE BORD INDICATEURS CLES <span id="KEYDEP" style="display: none;">national</span>
+    {% elseif is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+        TABLEAU DE BORD INDICATEURS CLES | <strong>{{ connectedUser.prefecture.region.nom }}</strong><span id="KEYDEP" style="display: none;">{{ connectedUser.prefecture.region.code }}</span>
+    {% elseif is_granted('ROLE_CTD') %}
+        TABLEAU DE BORD INDICATEURS CLES | <strong>{{ connectedUser.prefecture.nom }}</strong><span id="KEYDEP" style="display: none;">{{ connectedUser.prefecture.code }}</span>
+    {% endif %}
+{% endblock %}
+
+{% block stylesheet %}
+ {{ parent() }}
+
+<style>
+.card {
+    margin-bottom: 7px;
+}
+
+.card .card-header {
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+</style>
+
+{% endblock stylesheet %}
+
+{% block body %}
+
+<div class="page-wrapper">
+	<div class="page-body">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-header-right">
+                    <div class="m-t-15 mr-3">
+                        <a href="{{ path('dynamic-dashboard') }}" type="button" class="btn btn-outline-info btn-mini waves-effect" style="font-size: 12px;">
+                            T. bord principal
+                        </a>
+                        <a href="{{ path('dynamic-stat-interviews') }}" type="button" class="btn btn-facebook btn-mini waves-effect" style="font-size: 12px;">
+                            Stat. interviews
+                        </a>
+                        <a href="{{ path('dynamic-concretisation') }}" type="button" class="btn btn-twitter btn-mini waves-effect" style="font-size: 12px;">
+                            Concrétisation
+                        </a>
+                        {# <a href="#" type="button" class="btn btn-secondary btn-mini waves-effect" style="font-size: 12px;">
+                            Indic. clés
+                        </a> #}
+                        <a href="{{ path('dynamic-indic-qualite') }}" type="button" class="btn btn-primary btn-mini waves-effect" style="font-size: 12px;">
+                            Indic. de qualité
+                        </a> 
+                        <a href="{{ path('dynamic-rapports') }}" type="button" class="btn btn-warning btn-mini waves-effect" style="font-size: 12px;">
+                            Rapports
+                        </a>
+                    </div>
+                </div>
+                <h5>Filtres géographiques</h5>
+                <span>Appliquez des filtres du niveau {% if is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %} <code>régional</code> {% elseif is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %} <code>national</code> {% else %} <code>départemental</code>  {% endif %} au niveau <code>district de recensement</code></span>
+            </div>
+            <div class="card-block" style="padding-bottom: 0.5rem; padding-top: 0.25rem;">
+                <div class="row">
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="region" name="select" class="form-control form-control-primary">
+                            <option value="all">CHOISIR UNE REGION</option>
+                            {% for reg in regions %}
+                                <option value="{{ reg.code }}">{{ reg.nom }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="pref" name="select" class="form-control form-control-info">
+                            <option value=""></option>
+                        </select>
+                    </div>
+                    {% elseif is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="pref" name="select" class="form-control form-control-info">
+                            <option value="{{ connectedUser.prefecture.region.code }}">CHOISIR UNE PREFECTURE</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') or is_granted('ROLE_COORDINATION') or is_granted('ROLE_GEOMATICIEN') or is_granted('ROLE_COMITE_DE_VEILLE') or is_granted('ROLE_SRSD') 
+                        or is_granted('ROLE_CTR') or is_granted('ROLE_SRSD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="comm" name="select" class="form-control form-control-success">
+                            <option value="opt1"></option>
+                        </select>
+                    </div>
+                    {% elseif is_granted('ROLE_CTD') %}
+                    <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="comm" name="select" class="form-control form-control-success">
+                            <option value="{{connectedUser.prefecture.code}}">CHOISIR UNE COMMUNE</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {# <div class="col-sm-12 col-xl-3 m-b-15" style="margin-bottom: 1px; margin-top: 3px">
+                        <select id="filtre_dr" name="select" class="form-control form-control-inverse">
+                            <option value="opt1"></option>
+                        </select>
+                    </div> #}
+                </div>
+            </div>
+        </div>
+
+        <div class="row" id="dashboard-block" style="margin-right:-3px ;margin-left: -3px">
+
+        </div>
+    </div>
+</div>
+</div>
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent()}}
+
+<script>
+
+$(document).ready(function(){
+      
+    afficherIndicateur(Routing.generate('generateIndicators',{'page': 'cles', 'niveau': 'all', 'code': 'all'}));
+
+    //Implémentation des filtres
+
+    
+    $('#region').change(function(){
+                let code = $(this).val();
+                let level = '1';
+                if(code == 'all'){
+                    level = 'all';
+                }
+
+                afficherIndicateur(Routing.generate('generateIndicators',{'page': 'cles', 'niveau': level, 'code': code}));
+
+                $('#pref').html("");
+                $('#comm').html("");
+                $('#filtre_dr').html("");
+                if ($("#filtre_dr").data("select2")) {
+                    $("#filtre_dr").select2('destroy'); 
+                }
+
+                $.ajax({
+                    url: "{{ path('app_prefectures_region') }}",
+                    data: { code: code },
+                    method: 'GET',
+                    success: function (prefectures) {
+                        // $('#pref').attr('required', 'required');
+                        if (prefectures.length > 0){
+
+                            $('#pref').append(`<option value='all'>CHOISIR UNE PREFECTURE</option>`);
+                            prefectures.map(pref => {
+                                $('#pref').append(`<option value='${pref.code}'>${pref.nom}</option>`);
+                            });
+                            
+                        }                        
+                    }, error: function (status, code) {
+                        $('#pref').html("");
+                    }
+                });
+            });
+
+            $('#pref').change(function(){
+                let code = $(this).val();
+                let level = '2';
+                if(code == 'all'){
+                    level = '1';
+                    code =  $('#region').val();
+                }
+
+                afficherIndicateur(Routing.generate('generateIndicators',{'page': 'cles', 'niveau': level, 'code': code}));
+
+                $('#comm').html("");
+                $('#filtre_dr').html("");
+                if ($("#filtre_dr").data("select2")) {
+                    $("#filtre_dr").select2('destroy'); 
+                }
+
+                $.ajax({
+                    url: "{{ path('app_communes_prefecture') }}",
+                    data: { code: code },
+                    method: 'GET',
+                    success: function (communes) {
+                        // $('#comm').attr('required', 'required');
+                        if (communes.length > 0){
+
+                            $('#comm').append(`<option value='all'>CHOISIR UNE COMMUNE</option>`);
+                            communes.map(comm => {
+                                $('#comm').append(`<option value='${comm.code}'>${comm.nom}</option>`);
+                            });
+                            
+                        }                        
+                    }, error: function (status, code) {
+                        $('#comm').html("");
+                    }
+                });
+            });
+
+
+            $('#comm').change(function(){
+                let code = $(this).val();
+                let level = '3';
+                if(code == 'all'){
+                    level = '2';
+                    code =  $('#pref').val();
+                }
+
+                afficherIndicateur(Routing.generate('generateIndicators',{'page': 'cles', 'niveau': level, 'code': code}));
+
+                // $('#filtre_dr').html("");
+                // if ($("#filtre_dr").data("select2")) {
+                //     $("#filtre_dr").select2('destroy'); 
+                // }
+
+
+                // $('#filtre_dr').select2();
+
+            });
+
+
+            $('#filtre_dr').on('select2:select' , function(e){
+
+                var the_dr_code = e.params.data.id;
+
+            });
+
+});
+
+
+</script>
+
+<script src="{{ asset('myJS.js') }}"></script>
+
+{% endblock %}

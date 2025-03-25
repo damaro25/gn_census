@@ -1,0 +1,362 @@
+{% extends "base.html.twig" %}
+
+{% block title %} {{"Candidate #{candidat.submissionNumber}   #{candidat.name}  #{candidat.surname} "}} {% endblock %}
+
+{% block body %}
+
+ 
+        <!--profile cover start-->
+        <div class="row">
+            <div class="col-lg-5">
+                <div class="cover-profile">
+                    <div class="profile-bg-img">
+                        
+         
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2">
+                <div class="cover-profile">
+                    <div class="profile-bg-img">
+                        <div class="col-md-12">
+                            <div class="media-right">
+                                <a href="#" class="profile-image">
+                                    {% if photo %}
+                                        <img class="user-img img-circle" src="{{ asset('photo_profil/' ~ photo) }}" alt="user-img" width="128" height="128">
+                                    {% else %}
+                                        <img class="user-img img-circle" src="{{ asset('dist/assets/images/user.png') }}" alt="user-img">
+                                    {% endif %}
+                                </a>
+                                <br/><br/>
+                                <div class="user-title">
+                                    <h2>{{ " #{candidat.name} #{candidat.surname}" }}</h2>
+                                    <h4><span class="text-black">Score {{candidat.score}}</span></h4>
+                                </div>
+                            </div>
+                        </div>
+                        {# <img class="profile-bg-img img-fluid" src="{{ asset('dist/assets/images/user-profile/bg-img1.jpg') }}" alt="bg-img"> #}
+                        {# <img class="profile-bg-img img-fluid" src="{{ asset('dist/img/logo_rgph5.png') }}" alt="bg-img"> #}
+                        <div class="card-block user-info">
+                            <div class="col-md-12">
+                                <div class="media-left">
+                                    <a href="#" class="profile-image">
+                                        
+                                    </a>
+                                </div>
+                                <div class="media-body row">
+                                    <div class="col-lg-12">
+                                        
+                                    </div>
+                                  {#   <div>
+                                        <div class="pull-right cover-btn">
+                                            <button type="button" class="btn btn-primary m-r-10 m-b-5"><i class="icofont icofont-plus"></i> Follow</button>
+                                            <button type="button" class="btn btn-primary m-b-5"><i class="icofont icofont-ui-messaging"></i> Message</button>
+                                        </div>
+                                    </div> #}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="cover-profile">
+                    <div class="profile-bg-img">
+                        
+         
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <!--profile cover end-->
+        <div class="row">
+            <div class="col-lg-12">
+                <!-- tab header start -->
+                <div class="tab-header">
+                    <ul class="nav nav-tabs md-tabs tab-timeline" role="tablist" id="mytab">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-toggle="tab" href="#personal" role="tab">Identification</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#binfo" role="tab">Personal Information</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#contacts" role="tab">Studies</a>
+                            <div class="slide"></div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-toggle="tab" href="#review" role="tab">Attachments</a>
+                            <div class="slide"></div>
+                        </li>
+                    </ul>
+                </div>
+                <!-- tab header end -->
+                <!-- tab content start -->
+                <div class="tab-content">
+                    <!-- tab panel personal start -->
+                    <div class="tab-pane active" id="personal" role="tabpanel">
+                        <!-- personal card start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">About the candidate</h5>
+                              {#   <button id="edit-btn" type="button" class="btn btn-sm btn-primary waves-effect waves-light f-right">
+                                    <i class="icofont icofont-edit"></i>
+                                </button> #}
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">Lga</th>
+                                                                    <td>{{candidat.lga.name | default("")}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Posting district</th>
+                                                                    <td>{{candidat.district.name | default("")}} </td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Address</th>
+                                                                    <td>{{ candidat.currentAddress}}</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">Name</th>
+                                                                    <td>{{ candidat.name}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Surname</th>
+                                                                    <td>{{ candidat.surname}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Date od birth</th>
+                                                                    <td>{{ candidat.birthDate | date('d-m-Y')}}</td>
+                                                                </tr>                                                             
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                </div>
+                                                <!-- end of row -->
+                                            </div>
+                                            <!-- end of general info -->
+                                        </div>
+                                        <!-- end of col-lg-12 -->
+                                    </div>
+                                    <!-- end of row -->
+                                </div>
+                                
+                            </div>
+                            <!-- end of card-block -->
+                        </div>
+                        
+                        <!-- personal card end-->
+                    </div>
+                    <!-- tab pane personal end -->
+                    <!-- tab pane info start -->
+                    <div class="tab-pane" id="binfo" role="tabpanel">
+                        <!-- info card start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Personal informations</h5>
+                               {#  <button id="edit-btn" type="button" class="btn btn-sm btn-primary waves-effect waves-light f-right">
+                                    <i class="icofont icofont-edit"></i>
+                                </button> #}
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">Address during the census</th>
+                                                                    <td>{{ candidat.temporalDistrictResidence.name | default("")}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Whatsapp phone</th>
+                                                                    <td>{{ candidat.whatsappPhone }}</td>
+                                                                </tr>
+                                                                
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">National Identification Number</th>
+                                                                    <td>{{ candidat.nin}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Email</th>
+                                                                    <td>{{ candidat.email}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Phone</th>
+                                                                    <td>{{candidat.phone}} </td>
+                                                                </tr>
+                                                             
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                </div>
+                                                <!-- end of row -->
+                                            </div>
+                                            <!-- end of general info -->
+                                        </div>
+                                        <!-- end of col-lg-12 -->
+                                    </div>
+                                    <!-- end of row -->
+                                </div>
+                                
+                            </div>
+                            <!-- end of card-block -->
+                        </div>
+                      
+                        <!-- info card end -->
+                    </div>
+                    <!-- tab pane info end -->
+                    <!-- tab pane contact start -->
+                    <div class="tab-pane" id="contacts" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Studies</h5>
+                              {#   <button id="edit-btn" type="button" class="btn btn-sm btn-primary waves-effect waves-light f-right">
+                                    <i class="icofont icofont-edit"></i>
+                                </button> #}
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">Diploma</th>
+                                                                    <td>{{ candidat.diploma}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Language</th>
+                                                                    <td>{{ candidat.language1}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Language 2</th>
+                                                                    <td>{{ candidat.language2 }}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Language 3</th>
+                                                                    <td>{{ candidat.language3 }}</td>
+                                                                </tr>
+                                                                
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                    <div class="col-lg-12 col-xl-6">
+                                                        <div class="table-responsive">
+                                                        <table class="table">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">Computer knowledge</th>
+                                                                    <td>{{ candidat.computerKnowledge ? '<span class="badge badge-success">YES</span>' : '<span class="badge badge-danger">NO</span>'}}</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <th scope="row">Census Or Survey experience</th>
+                                                                    <td>{{ candidat.censusOrSurvey ? '<span class="badge badge-success">YES</span>' : '<span class="badge badge-danger">NO</span>'}}</td>
+                                                                </tr>
+                                                                {% if candidat.censusOrSurvey  %}
+                                                                    <tr>
+                                                                        <th scope="row">Number of census or survey </th>
+                                                                        <td>{{candidat.NbrCensus }} Census/Survey </td>
+                                                                    </tr>
+                                                                {% endif %}                                                                             
+                                                            </tbody>
+                                                        </table>
+                                                        </div>
+                                                    </div>
+                                                    <!-- end of table col-lg-6 -->
+                                                </div>
+                                                <!-- end of row -->
+                                            </div>
+                                            <!-- end of general info -->
+                                        </div>
+                                        <!-- end of col-lg-12 -->
+                                    </div>
+                                    <!-- end of row -->
+                                </div>
+                                
+                            </div>
+                            <!-- end of card-block -->
+                        </div>
+                    </div>
+                    <!-- tab pane contact end -->
+                    <div class="tab-pane" id="review" role="tabpanel">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-header-text">Attachments</h5>
+                            </div>
+                            <div class="card-block">
+                                <div class="view-info">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="general-info">
+                                                <div class="row">
+                                                    <div class="col-xl-12">
+                                                        <div class="table-responsive">
+                                                        <table class="table m-0">
+                                                            <tbody>
+                                                                <tr>
+                                                                    <th scope="row">files</th>
+                                                                    <td> <a target="_blank" href='{{path( "get_attachments_candidat",  {"submissionNumber": candidat.submissionNumber  }   )}}'>Download the Attachments</a></td>
+                                                                </tr>
+                                                                </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- tab content end -->
+            </div>
+        </div>
+    
+    {% endblock %}
+

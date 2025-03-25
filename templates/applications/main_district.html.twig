@@ -1,0 +1,161 @@
+{% extends "base.html.twig" %}
+
+{% block title %} Main list | {{ district.name ~" | "~ district.fdcode }}  {% endblock %}
+
+{% block body %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-block">
+                    <div class="table-responsive dt-responsive">
+                        <table id="dt-Candidateures" class="table table-striped table-bordered nowrap" style="width: 100%;">
+                            <thead>
+                                <tr>  
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Submission number</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Surname</th>
+                                    <th scope="col">Lga</th>
+                                    <th scope="col">District</th>
+                                    <th scope="col">Date of birth</th>
+                                    <th scope="col">Last diploma</th>
+                                    <th scope="col" title="Computer knowledge">Computer knowledge</th>
+                                    <th scope="col">Census or Survey</th>
+                                    <th scope="col">Use of tablet</th>
+                                    <th scope="col">Files</th>
+                                    <th scope="col">Candidate</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col">Score</th>
+                                    <th scope="col">Submission number</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">Surname</th>
+                                    <th scope="col">Lga</th>
+                                    <th scope="col">District</th>
+                                    <th scope="col"></th>
+                                    <th scope="col">Last diploma</th>
+                                    <th scope="col">Computer knowledge</th>
+                                    <th scope="col">Census or Survey</th>
+                                    <th scope="col">Use of tablet</th>
+                                    <th scope="col">Files</th>
+                                    <th scope="col">Candidat</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>                        
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block javascript %}
+    {{ parent() }}
+
+    <script>
+        var usersDt;
+        var regionCode;
+        var dtCandidaturesReaffectation
+                
+        $(document).ready(function(){
+            var is_com_recrutement = '{{ iscom }}' == 1 ? true : false;
+
+            $('#dt-Candidateures thead tr:nth-child(2) th').each( function () {
+                var title = $(this).text();
+                if (title){
+                    if (title == "isAffected") {
+                        $(this).html( `<select  class="form-control form-control-xs" size="height:none">
+                                            <option></option>
+                                            <option value="1">Affected to a supervisor</option>
+                                            <option value="0">Unaffected</option>
+                                        </select>    
+                        `);
+                    } else {
+                        $(this).html( '<input type="text" class="form-control form-control-xs" style="width:90%" placeholder="Search '+title+'" />' );
+                    }
+                }
+            });
+
+            usersDt = $('#dt-Candidateures').DataTable({
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.11.3/i18n/fr_fr.json'
+                },
+                "serverSide": true,
+                "processing": true,    
+                "ajax": "{{app.request.attributes.get('_route_params') | length > 0 ?  path(app.request.attributes.get('_route'),app.request.attributes.get('_route_params')) :  path(app.request.attributes.get('_route'))  }}",
+                "paging": true,
+                "pageLength": 50,
+                "lengthMenu": [ 10,20, 25, 50, 100],
+                "order": [[ 0, 'desc' ]],
+                "columns": [
+                       
+                        { "data": "score", "orderable": true },
+                        { "data": "submission_number" ,  'render': function(data, type,row){
+                            return `<span style="font-weight:bold" >${data}</span>`;
+                        } },
+                        { "data": "name" },
+                        { "data": "surname" },
+                        {"data": "lga.name",'default': ''},
+                        {"data": "distrcit.name",'default': ''},
+                        {"data": "birthDate"},
+                        {"data": "diploma"},
+                        {'data': 'computer_knowledge', 'render': function(data,type,row){
+                                return row.computer_knowledge?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                            }
+                        },
+                        {'data': 'census_or_survey', 'render': function(data,type,row){
+                            return row.census_or_survey?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                             }
+                        },
+                        {'data': 'use_of_tablet', 'render': function(data,type,row){
+                            return row.use_of_tablet?`<i  style="color:green;font-size:16px;margin-left: 30%;" class="ti-check"></i>`: `<i style="color:red;font-size:16px;margin-left: 30%;" class="ti-na"></i>`; 
+                             }
+                        },
+                        {'default': '', 'render': function(data,type,row){
+                            return ` <a target="_blank"  class='btn btn-default btn-xs waves-effect waves-light' href="${Routing.generate('get_attachments_candidat', {'submissionNumber':row.submission_number })}">  <i  style="font-size:16px;margin-left: 30%; cursor:pointer " class="ti-archive"></i></a>`; 
+                             }
+                        },
+
+                        {'default': '', 'render': function(data,type,row){
+                            var url = Routing.generate('app_Candidats_detail', { id: row.id });
+                            return ` <a   class='btn btn-default btn-xs waves-effect waves-light' href="${url}">  <i  style="font-size:16px;margin-left: 30%; cursor:pointer " class="ti-id-badge"></i></a>`; 
+                             }
+                        }
+                        
+                        
+                    ],
+                    initComplete: function () {
+                        // Apply the search
+                        this.api().columns().every( function () {
+                            var that = this;
+                            $( 'input', this.header() ).on( 'keyup change clear', function (e) {
+                                if (e.keyCode == 13 && that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+
+                            $('select', this.header() ).on( 'change', function (e) {
+                                if (that.search() !== this.value ) {
+                                    that
+                                        .search( this.value )
+                                        .draw();
+                                }
+                            });
+
+                        });
+                    },
+                    drawCallback: function(settings){
+                        $("#dt-Candidateures_filter").hide();
+                    }        
+            });
+
+
+                
+        });
+    </script>
+{% endblock %}
+
