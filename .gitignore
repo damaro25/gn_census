@@ -1,0 +1,21 @@
+###> symfony/framework-bundle ###
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/config/packages/doctrine.yaml
+/files/
+/var/
+/vendor/
+/public/sheets/
+/public/profil_image/
+/public/qrcodes/
+/migrations/
+/public/TEMPLATE_*
+.git_save/
+.git_old_14052023/
+###< symfony/framework-bundle ###
+composer.lock
+node_modules
+.DS_Store
