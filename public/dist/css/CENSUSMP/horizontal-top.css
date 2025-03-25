@@ -1,0 +1,48 @@
+@media (min-width: 768px) {
+    .modal-xl {
+        width: 90%;
+        max-width:1200px;                
+    }
+
+    .Container{
+       /* height: 150px;
+        width: 250px; */
+        overflow-y: auto;
+        border-radius: 5px;
+        margin: 0 auto;
+        width: 90%;
+        max-width:1200px;
+    }
+    
+    .ContentClass{
+        width: 300px;
+        text-align: center;
+    }
+    
+    .Flipped, .Flipped .ContentClass{
+        transform: rotateX(180deg);
+    }
+    
+    /* Designing for scroll-bar */
+    ::-webkit-scrollbar {
+        width: 5px;
+    }
+
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: gainsboro;
+        border-radius: 5px;
+    }
+
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: black;
+        border-radius: 5px;
+    }
+
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+
+}

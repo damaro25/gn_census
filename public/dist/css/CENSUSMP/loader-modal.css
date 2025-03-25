@@ -1,0 +1,67 @@
+.censusmp-loader-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    /* z-index: -1; */
+    /* z-index: 1003; */
+    background-size: cover;
+    overflow: hidden;
+    text-align: center;
+
+    /* position:relative; */
+    z-index:1000;
+}
+
+.censusmp-loader-modal div:first-child {
+    display: block;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    border-radius: 50%;
+    box-shadow: 0 3px 3px 0 rgb(82, 5, 5);
+    transform: translate3d(0, 0, 0);
+    animation: spin 2s linear infinite
+}
+
+.censusmp-loader-modal div:first-child:after,
+.censusmp-loader-modal div:first-child:before {
+    content: '';
+    position: absolute;
+    border-radius: 50%
+}
+
+.censusmp-loader-modal div:first-child:before {
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    box-shadow: 0 3px 3px 0 rgb(5, 30, 80);
+    -webkit-animation: spin 3s linear infinite;
+    animation: spin 3s linear infinite
+}
+
+.censusmp-loader-modal div:first-child:after {
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    box-shadow: 0 3px 3px 0 rgb(3, 44, 15);
+    animation: spin 1.5s linear infinite
+}
+
+.bd-example-modal-lg .modal-dialog{
+    display: table;
+    position: relative;
+    margin: 0 auto;
+    top: calc(50% - 24px);
+  }
+
+  .bd-example-modal-lg .modal-dialog .modal-content{
+    background-color: transparent;
+    border: none;
+  }
