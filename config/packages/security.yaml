@@ -1,0 +1,71 @@
+security:
+    enable_authenticator_manager: true
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'bcrypt'
+        App\Entity\User:
+            algorithm: bcrypt
+            #algorithm: plaintext
+
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: username
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            lazy: true
+            pattern: ^/
+            user_checker: App\Events\UserChecker
+            provider: app_user_provider
+            custom_authenticator: App\Security\LoginAuthenticator
+            logout:
+                path: app_logout
+                invalidate_session: true
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#the-firewall
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+         - { path: ^/login, roles: PUBLIC_ACCESS }
+         - { path: ^/districts, roles: PUBLIC_ACCESS }
+         - { path: ^/districtsInLga, roles: PUBLIC_ACCESS }
+         - { path: ^/lgas, roles: PUBLIC_ACCESS }
+         - { path: ^/languages, roles: PUBLIC_ACCESS }
+         - { path: ^/apply ,  roles:  PUBLIC_ACCESS}
+         - { path: ^/application_search_me, roles: PUBLIC_ACCESS}
+         - { path: ^/is_periode_application , roles: PUBLIC_ACCESS}
+         - { path: ^/captcha/index, roles: PUBLIC_ACCESS }
+         - { path: ^/captcha/mycaptcha, roles: PUBLIC_ACCESS }
+         - { path: ^/getCandidatUpdate/\d, roles: PUBLIC_ACCESS}
+         - { path: ^/getCandidatToConfirm/, roles: PUBLIC_ACCESS}
+         - { path: ^/candidatConfirmDisponibilite, roles: PUBLIC_ACCESS}
+         - { path: ^/reapply/\d, roles: PUBLIC_ACCESS }
+         - { path: ^/attestations/agents/, roles: PUBLIC_ACCESS }
+         - { path: /allowReapply, roles: PUBLIC_ACCESS }
+         - { path: /getMyAttachments, roles: PUBLIC_ACCESS}
+         - { path: /check_ar/, roles: PUBLIC_ACCESS}
+         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
+
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon
